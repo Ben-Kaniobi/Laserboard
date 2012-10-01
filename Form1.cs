@@ -92,10 +92,10 @@ namespace Pointboard
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Calibrate_perspective();
+            calibrated = Calibrate_perspective();
         }
 
-        private void Calibrate_perspective()
+        private bool Calibrate_perspective()
         {
             //Load and display chessboard image for calibration
             Image<Gray, Byte> image_chessboard = new Image<Gray, byte>(FILE_CHESSBOARD);
@@ -106,6 +106,12 @@ namespace Pointboard
             Emgu.CV.CvEnum.CALIB_CB_TYPE calibrations = Emgu.CV.CvEnum.CALIB_CB_TYPE.ADAPTIVE_THRESH | Emgu.CV.CvEnum.CALIB_CB_TYPE.NORMALIZE_IMAGE | Emgu.CV.CvEnum.CALIB_CB_TYPE.FILTER_QUADS;
             PointF[] corners_dst = CameraCalibration.FindChessboardCorners(image_chessboard, size_p, calibrations);
             PointF[] corners_src = CameraCalibration.FindChessboardCorners(image_original.Convert<Gray, Byte>(), size_p, calibrations);
+            if (corners_src == null || corners_dst == null)
+            {
+                lbl_info.Text = "Chessboard pattern not found";
+                return false;
+            }
+
 
             //Create matrix for transformation
             t_matrix = CameraCalibration.FindHomography(corners_src, corners_dst, Emgu.CV.CvEnum.HOMOGRAPHY_METHOD.DEFAULT, 1);
@@ -124,7 +130,7 @@ namespace Pointboard
             box_final.Image = null;
             box_final.BackColor = Color.Black;
 
-            calibrated = true;
+            return true; //Successful
         }
 
         private void Find_circles()
