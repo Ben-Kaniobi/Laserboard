@@ -31,9 +31,10 @@
             this.box_original = new System.Windows.Forms.PictureBox();
             this.lbl_info = new System.Windows.Forms.Label();
             this.box_transformed = new System.Windows.Forms.PictureBox();
-            this.btn_calibrate = new System.Windows.Forms.Button();
+            this.btn_Calibrate = new System.Windows.Forms.Button();
             this.box_filtered = new System.Windows.Forms.PictureBox();
             this.box_final = new System.Windows.Forms.PictureBox();
+            this.btn_Test = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.box_original)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_transformed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_filtered)).BeginInit();
@@ -67,16 +68,16 @@
             this.box_transformed.TabIndex = 2;
             this.box_transformed.TabStop = false;
             // 
-            // btn_calibrate
+            // btn_Calibrate
             // 
-            this.btn_calibrate.Enabled = false;
-            this.btn_calibrate.Location = new System.Drawing.Point(12, 513);
-            this.btn_calibrate.Name = "btn_calibrate";
-            this.btn_calibrate.Size = new System.Drawing.Size(75, 23);
-            this.btn_calibrate.TabIndex = 5;
-            this.btn_calibrate.Text = "Calibrate";
-            this.btn_calibrate.UseVisualStyleBackColor = true;
-            this.btn_calibrate.Click += new System.EventHandler(this.button1_Click);
+            this.btn_Calibrate.Enabled = false;
+            this.btn_Calibrate.Location = new System.Drawing.Point(12, 513);
+            this.btn_Calibrate.Name = "btn_Calibrate";
+            this.btn_Calibrate.Size = new System.Drawing.Size(75, 23);
+            this.btn_Calibrate.TabIndex = 5;
+            this.btn_Calibrate.Text = "Calibrate";
+            this.btn_Calibrate.UseVisualStyleBackColor = true;
+            this.btn_Calibrate.Click += new System.EventHandler(this.btn_Calibrate_Click);
             // 
             // box_filtered
             // 
@@ -96,12 +97,23 @@
             this.box_final.TabIndex = 2;
             this.box_final.TabStop = false;
             // 
+            // btn_Test
+            // 
+            this.btn_Test.Location = new System.Drawing.Point(429, 513);
+            this.btn_Test.Name = "btn_Test";
+            this.btn_Test.Size = new System.Drawing.Size(75, 23);
+            this.btn_Test.TabIndex = 6;
+            this.btn_Test.Text = "Test-image";
+            this.btn_Test.UseVisualStyleBackColor = true;
+            this.btn_Test.Click += new System.EventHandler(this.btn_Test_Click);
+            // 
             // frm_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(516, 548);
-            this.Controls.Add(this.btn_calibrate);
+            this.Controls.Add(this.btn_Test);
+            this.Controls.Add(this.btn_Calibrate);
             this.Controls.Add(this.box_final);
             this.Controls.Add(this.box_filtered);
             this.Controls.Add(this.box_transformed);
@@ -127,9 +139,10 @@
         private System.Windows.Forms.PictureBox box_original;
         private System.Windows.Forms.Label lbl_info;
         private System.Windows.Forms.PictureBox box_transformed;
-        private System.Windows.Forms.Button btn_calibrate;
+        private System.Windows.Forms.Button btn_Calibrate;
         private System.Windows.Forms.PictureBox box_filtered;
         private System.Windows.Forms.PictureBox box_final;
+        private System.Windows.Forms.Button btn_Test;
     }
 }
 

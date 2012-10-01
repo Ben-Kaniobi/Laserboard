@@ -21,8 +21,7 @@ namespace Pointboard
         const int N_CHESSFIELDS_X = 8;
         const int N_CHESSFIELDS_Y = 6;
         const string FILE_CHESSBOARD = @"..\..\files\Chessboard.png";
-        const string FILE_TEST = @"..\..\files\Chessboard 2 Capture.jpg";
-        const string FILE_TEST2 = @"..\..\files\Test_Image_2.png";
+        const string FILE_TEST = @"..\..\files\Test_image_black_red.png";
 
         //Variables
         Image<Bgr, Byte> image_original;
@@ -48,9 +47,9 @@ namespace Pointboard
             drawings.SmoothingMode = SmoothingMode.AntiAlias;
 
             //Make sure files exist
-            if (!File.Exists(FILE_CHESSBOARD) || !File.Exists(FILE_TEST) || !File.Exists(FILE_TEST2))
+            if (!File.Exists(FILE_CHESSBOARD))
             {
-                lbl_info.Text = "Image not found";
+                lbl_info.Text = "Chessboard-image not found";
             }
             else
             {
@@ -61,7 +60,7 @@ namespace Pointboard
                 }
                 catch
                 {
-                    lbl_info.Text = "Image not found";
+                    lbl_info.Text = "Webcam not found";
                 }
 
                 Application.Idle += new EventHandler(Show_cam);
@@ -70,14 +69,13 @@ namespace Pointboard
 
         private void Show_cam(object sender, EventArgs e)
         {
-            //Load image and display webcam in box_original
-            //image_original = new Image<Bgr, byte>(FILE_TEST);
+            //Load and display webcam-image in box_original
             image_original = webcam.QueryFrame();
             box_original.Image = image_original.ToBitmap();
 
             if (!calibrated)
             {
-                btn_calibrate.Enabled = true;
+                btn_Calibrate.Enabled = true;
             }
             else
             {
@@ -97,7 +95,7 @@ namespace Pointboard
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btn_Calibrate_Click(object sender, EventArgs e)
         {
             //image_transformed = image_original;
             calibrated = Calibrate_perspective();
@@ -131,11 +129,29 @@ namespace Pointboard
             return true; //Successful
         }
 
+        private void btn_Test_Click(object sender, EventArgs e)
+        {
+            if(File.Exists(FILE_TEST))
+            {
+                box_final.Image = new Image<Bgr, byte>(FILE_TEST).ToBitmap();
+            }
+            else
+            {
+                lbl_info.Text = "Test-image not found";
+            }
+        }
+
         private void Find_circles()
         {
             //Clear image
-            //drawings.DrawImage(box_final.Image, 0, 0); //maybe backgroundimage
-            drawings.Clear(box_final.BackColor);
+            if (box_final.Image != null)
+            {
+                drawings.DrawImage(box_final.Image, 0, 0); //maybe backgroundimage
+            }
+            else
+            {
+                drawings.Clear(box_final.BackColor);
+            }
 
             //Find Circles
             CircleF[] circles = image_filtered.HoughCircles(
@@ -151,7 +167,8 @@ namespace Pointboard
             if (circles.Length > 0)
             {
                 Pen pen_circle = new Pen(Color.Blue, 3);
-                drawings.DrawEllipse(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, circles[0].Radius * 2, circles[0].Radius * 2);
+                float radius = circles[0].Radius + pen_circle.Width;
+                drawings.DrawEllipse(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, radius * 2, radius * 2);
             }
 
             /*//int circle_number = 0;
