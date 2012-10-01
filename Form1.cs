@@ -139,7 +139,7 @@ namespace Pointboard
 
             //Find Circles
             CircleF[] circles = image_filtered.HoughCircles(
-            new Gray(180), //The higher threshold of the two passed to Canny edge detector (the lower one will be twice smaller)
+            new Gray(180), //The higher threshold of the two passed to Canny edge detector (dthe lower one will be twice smaller)
             new Gray(6), //Accumulator threshold at the center detection stage
             1.0, //Resolution of the accumulator used to detect centers of the circles
             10.0, //Min distance
