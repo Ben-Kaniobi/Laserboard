@@ -24,6 +24,7 @@ namespace Pointboard
         const string FILE_TEST = @"..\..\files\Test_image_black_red.png";
 
         //Variables
+        Image<Gray, Byte> image_chessboard;
         Image<Bgr, Byte> image_original;
         Image<Bgr, Byte> image_transformed;
         Image<Gray, Byte> image_filtered;
@@ -50,13 +51,12 @@ namespace Pointboard
             {
                 //Capture webcam
                 webcam = new Capture();
+                Application.Idle += new EventHandler(Show_cam);
             }
             catch
             {
                 lbl_info.Text = "Webcam not found";
             }
-
-            Application.Idle += new EventHandler(Show_cam);
             
         }
 
@@ -96,8 +96,12 @@ namespace Pointboard
 
         private bool Calibrate_perspective()
         {
-            //Load (with same size as original) and display chessboard image for calibration
-            Image<Gray, Byte> image_chessboard = new Image<Gray, byte>(Laserboard.Properties.Resources.Chessboard).Resize(image_original.Width, image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+            if (image_chessboard == null)
+            {//Chessboard-image not loaded yet
+                //Load (with same size as original)
+                image_chessboard = new Image<Gray, byte>(Laserboard.Properties.Resources.Chessboard).Resize(image_original.Width, image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+            }
+            //Display
             box_final.Image = image_chessboard.ToBitmap();
 
             //Get corner-points of original and captured chessboard
