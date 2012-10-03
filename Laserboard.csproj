@@ -108,6 +108,7 @@
     <Content Include="Emgu.CV.dll" />
     <Content Include="Emgu.CV.UI.dll" />
     <Content Include="Emgu.Util.dll" />
+    <None Include="ressources\Chessboard.png" />
     <Content Include="x86\cublas32_42_9.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

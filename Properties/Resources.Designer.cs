@@ -59,5 +59,12 @@ namespace Laserboard.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Bitmap Chessboard {
+            get {
+                object obj = ResourceManager.GetObject("Chessboard", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

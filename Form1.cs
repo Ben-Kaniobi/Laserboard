@@ -20,7 +20,7 @@ namespace Pointboard
         //Constants
         const int N_CHESSFIELDS_X = 8;
         const int N_CHESSFIELDS_Y = 6;
-        const string FILE_CHESSBOARD = @"..\..\files\Chessboard.png";
+        //const string FILE_CHESSBOARD = @"..\..\files\Chessboard.png";
         const string FILE_TEST = @"..\..\files\Test_image_black_red.png";
 
         //Variables
@@ -45,26 +45,19 @@ namespace Pointboard
             //Create graphics to draw on box_final
             drawings = box_final.CreateGraphics();
             drawings.SmoothingMode = SmoothingMode.AntiAlias;
-
-            //Make sure files exist
-            if (!File.Exists(FILE_CHESSBOARD))
+            
+            try
             {
-                lbl_info.Text = "Chessboard-image not found";
+                //Capture webcam
+                webcam = new Capture();
             }
-            else
+            catch
             {
-                try
-                {
-                    //Capture webcam
-                    webcam = new Capture();
-                }
-                catch
-                {
-                    lbl_info.Text = "Webcam not found";
-                }
-
-                Application.Idle += new EventHandler(Show_cam);
+                lbl_info.Text = "Webcam not found";
             }
+
+            Application.Idle += new EventHandler(Show_cam);
+            
         }
 
         private void Show_cam(object sender, EventArgs e)
@@ -76,6 +69,7 @@ namespace Pointboard
             if (!calibrated)
             {
                 btn_Calibrate.Enabled = true;
+                calibrated = Calibrate_perspective();
             }
             else
             {
@@ -97,14 +91,13 @@ namespace Pointboard
 
         private void btn_Calibrate_Click(object sender, EventArgs e)
         {
-            //image_transformed = image_original;
             calibrated = Calibrate_perspective();
         }
 
         private bool Calibrate_perspective()
         {
             //Load (with same size as original) and display chessboard image for calibration
-            Image<Gray, Byte> image_chessboard = new Image<Gray, byte>(FILE_CHESSBOARD).Resize(image_original.Width, image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+            Image<Gray, Byte> image_chessboard = new Image<Gray, byte>(Laserboard.Properties.Resources.Chessboard).Resize(image_original.Width, image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
             box_final.Image = image_chessboard.ToBitmap();
 
             //Get corner-points of original and captured chessboard
@@ -112,12 +105,7 @@ namespace Pointboard
             Emgu.CV.CvEnum.CALIB_CB_TYPE calibrations = Emgu.CV.CvEnum.CALIB_CB_TYPE.ADAPTIVE_THRESH | Emgu.CV.CvEnum.CALIB_CB_TYPE.NORMALIZE_IMAGE | Emgu.CV.CvEnum.CALIB_CB_TYPE.FILTER_QUADS;
             PointF[] corners_dst = CameraCalibration.FindChessboardCorners(image_chessboard, size_p, calibrations);
             PointF[] corners_src = CameraCalibration.FindChessboardCorners(image_original.Convert<Gray, Byte>(), size_p, calibrations);
-            if (corners_src == null || corners_dst == null)
-            {
-                lbl_info.Text = "Chessboard pattern not found";
-                return false;
-            }
-
+            if (corners_src == null || corners_dst == null) return false; //Chessboard not found
 
             //Create matrix for transformation
             t_matrix = CameraCalibration.FindHomography(corners_src, corners_dst, Emgu.CV.CvEnum.HOMOGRAPHY_METHOD.DEFAULT, 1);
@@ -146,7 +134,7 @@ namespace Pointboard
             //Clear image
             if (box_final.Image != null)
             {
-                drawings.DrawImage(box_final.Image, 0, 0); //maybe backgroundimage
+                drawings.DrawImage(box_final.Image, 0, 0);
             }
             else
             {
@@ -171,7 +159,8 @@ namespace Pointboard
                 drawings.DrawEllipse(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, radius * 2, radius * 2);
             }
 
-            /*//int circle_number = 0;
+            /*Mark multiple circles
+            //int circle_number = 0;
             //lbl_info.Text = "";
             //foreach (CircleF circle in circles)
             {
