@@ -20,19 +20,18 @@ namespace Pointboard
         //Constants
         const int N_CHESSFIELDS_X = 8;
         const int N_CHESSFIELDS_Y = 6;
-        //const string FILE_CHESSBOARD = @"..\..\files\Chessboard.png";
         const string FILE_TEST = @"..\..\files\Test_image_black_red.png";
 
         //Variables
-        Image<Gray, Byte> image_chessboard;
-        Image<Bgr, Byte> image_original;
-        Image<Bgr, Byte> image_transformed;
-        Image<Gray, Byte> image_filtered;
-        Graphics drawings;
-        Capture webcam;
-        bool calibrated = false;
+        Image<Gray, Byte> Image_chessboard;
+        Image<Bgr, Byte> Image_original;
+        Image<Bgr, Byte> Image_transformed;
+        Image<Gray, Byte> Image_filtered;
+        Graphics Drawings;
+        Capture Webcam;
+        bool Calibrated = false;
 
-        HomographyMatrix t_matrix;
+        HomographyMatrix Transformation_matrix;
 
         public frm_Main()
         {
@@ -44,75 +43,75 @@ namespace Pointboard
             lbl_info.Text = "";
 
             //Create graphics to draw on box_final
-            drawings = box_final.CreateGraphics();
-            drawings.SmoothingMode = SmoothingMode.AntiAlias;
+            Drawings = box_final.CreateGraphics();
+            Drawings.SmoothingMode = SmoothingMode.AntiAlias;
             
             try
             {
-                //Capture webcam
-                webcam = new Capture();
+                //Capture Webcam
+                Webcam = new Capture();
                 Application.Idle += new EventHandler(Show_cam);
             }
             catch
             {
                 lbl_info.Text = "Webcam not found";
-            }
-            
+            }            
         }
 
         private void Show_cam(object sender, EventArgs e)
         {
-            //Load and display webcam-image in box_original
-            image_original = webcam.QueryFrame();
-            box_original.Image = image_original.ToBitmap();
+            //Load and display Webcam-image in box_original
+            Image_original = Webcam.QueryFrame();
+            box_original.Image = Image_original.ToBitmap();
 
-            if (!calibrated)
+            if (!Calibrated)
             {
                 btn_Calibrate.Enabled = true;
-                calibrated = Calibrate_perspective();
+                Calibrated = Calibrate_perspective();
             }
             else
             {
-                //Transform and resize image
-                image_transformed = image_original.WarpPerspective(t_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, new Bgr(Color.Green));
+                //Transform and display image
+                Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, new Bgr(Color.Green));
+                box_transformed.Image = Image_transformed.ToBitmap();
 
-                //lbl_info.Text = image_original.Size.Width + "-" + image_original.Size.Height + " " + image_transformed.Size.Width + "-" + image_transformed.Size.Height;
+                Filter();
 
-                //Display in box_transformed
-                box_transformed.Image = image_transformed.ToBitmap();
-
-                //Get red
-                image_filtered = image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
-                box_filtered.Image = image_filtered.ToBitmap();
-
-                Find_circles();
+                Find_point();
             }
+        }
+
+        private void Filter()
+        {
+            //Get red
+            Image_filtered = Image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
+            box_filtered.Image = Image_filtered.ToBitmap();
         }
 
         private void btn_Calibrate_Click(object sender, EventArgs e)
         {
-            calibrated = Calibrate_perspective();
+            Calibrated = Calibrate_perspective();
         }
 
         private bool Calibrate_perspective()
         {
-            if (image_chessboard == null)
+            if (Image_chessboard == null)
             {//Chessboard-image not loaded yet
                 //Load (with same size as original)
-                image_chessboard = new Image<Gray, byte>(Laserboard.Properties.Resources.Chessboard).Resize(image_original.Width, image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+                Image_chessboard = new Image<Gray, byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_original.Width, Image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
             }
             //Display
-            box_final.Image = image_chessboard.ToBitmap();
+            box_final.Image = Image_chessboard.ToBitmap();
 
             //Get corner-points of original and captured chessboard
             Size size_p = new Size(N_CHESSFIELDS_X - 1, N_CHESSFIELDS_Y - 1);
             Emgu.CV.CvEnum.CALIB_CB_TYPE calibrations = Emgu.CV.CvEnum.CALIB_CB_TYPE.ADAPTIVE_THRESH | Emgu.CV.CvEnum.CALIB_CB_TYPE.NORMALIZE_IMAGE | Emgu.CV.CvEnum.CALIB_CB_TYPE.FILTER_QUADS;
-            PointF[] corners_dst = CameraCalibration.FindChessboardCorners(image_chessboard, size_p, calibrations);
-            PointF[] corners_src = CameraCalibration.FindChessboardCorners(image_original.Convert<Gray, Byte>(), size_p, calibrations);
+            PointF[] corners_dst = CameraCalibration.FindChessboardCorners(Image_chessboard, size_p, calibrations);
+            PointF[] corners_src = CameraCalibration.FindChessboardCorners(Image_original.Convert<Gray, Byte>(), size_p, calibrations);
             if (corners_src == null || corners_dst == null) return false; //Chessboard not found
 
-            //Create matrix for transformation
-            t_matrix = CameraCalibration.FindHomography(corners_src, corners_dst, Emgu.CV.CvEnum.HOMOGRAPHY_METHOD.DEFAULT, 1);
+            //Get matrix for transformation
+            Transformation_matrix = CameraCalibration.FindHomography(corners_src, corners_dst, Emgu.CV.CvEnum.HOMOGRAPHY_METHOD.DEFAULT, 1);
 
             //Clear box_final
             box_final.Image = null;
@@ -133,20 +132,20 @@ namespace Pointboard
             }
         }
 
-        private void Find_circles()
+        private void Find_point()
         {
             //Clear image
             if (box_final.Image != null)
             {
-                drawings.DrawImage(box_final.Image, 0, 0);
+                Drawings.DrawImage(box_final.Image, 0, 0);
             }
             else
             {
-                drawings.Clear(box_final.BackColor);
+                Drawings.Clear(box_final.BackColor);
             }
 
             //Find Circles
-            CircleF[] circles = image_filtered.HoughCircles(
+            CircleF[] circles = Image_filtered.HoughCircles(
             new Gray(180), //The higher threshold of the two passed to Canny edge detector (the lower one will be twice smaller)
             new Gray(6), //Accumulator threshold at the center detection stage
             1.0, //Resolution of the accumulator used to detect centers of the circles
@@ -160,7 +159,7 @@ namespace Pointboard
             {
                 Pen pen_circle = new Pen(Color.Blue, 3);
                 float radius = circles[0].Radius + pen_circle.Width;
-                drawings.DrawEllipse(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, radius * 2, radius * 2);
+                Drawings.DrawEllipse(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, radius * 2, radius * 2);
             }
 
             /*Mark multiple circles
@@ -177,6 +176,49 @@ namespace Pointboard
                 lbl_info.Text += "(" + circle.Center.X + "; " + circle.Center.Y + ")  ";
                 Grafik.DrawEllipse(circlepen, circle.Center.X - circle.Radius, circle.Center.Y - circle.Radius, circle.Radius * 2, circle.Radius * 2);
             }*/
+        }
+
+        private void box_filtered_Click(object sender, EventArgs e)
+        {
+            if (box_filtered.Image != null)
+            {
+                sfd_Screenshot.Tag = box_filtered;
+                sfd_Screenshot.ShowDialog();
+            }
+        }
+
+        private void box_transformed_Click(object sender, EventArgs e)
+        {
+            if (box_transformed.Image != null)
+            {
+                sfd_Screenshot.Tag = box_transformed;
+                sfd_Screenshot.ShowDialog();
+            }
+        }
+
+        private void box_original_Click(object sender, EventArgs e)
+        {
+            if (box_original.Image != null)
+            {
+                sfd_Screenshot.Tag = box_original;
+                sfd_Screenshot.ShowDialog();
+            }
+        }
+
+        private void sfd_Screenshot_FileOk(object sender, CancelEventArgs e)
+        {
+            if (sfd_Screenshot.Tag == box_filtered)
+            {
+                box_filtered.Image.Save(sfd_Screenshot.FileName);
+            }
+            else if (sfd_Screenshot.Tag == box_transformed)
+            {
+                box_transformed.Image.Save(sfd_Screenshot.FileName);
+            }
+            else if (sfd_Screenshot.Tag == box_original)
+            {
+                box_original.Image.Save(sfd_Screenshot.FileName);
+            }
         }
 
         private void frm_Pointboard_FormClosing(object sender, FormClosingEventArgs e)
