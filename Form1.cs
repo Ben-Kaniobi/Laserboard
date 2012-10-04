@@ -21,6 +21,7 @@ namespace Pointboard
         const int N_CHESSFIELDS_X = 8;
         const int N_CHESSFIELDS_Y = 6;
         const string FILE_TEST = @"..\..\files\Test_image_black_red.png";
+        const string FILE_TEST_2 = @"..\..\files\Screenshot.png";
 
         //Variables
         Image<Gray, Byte> Image_chessboard;
@@ -72,7 +73,8 @@ namespace Pointboard
             else
             {
                 //Transform and display image
-                Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, new Bgr(Color.Green));
+                Image_transformed = new Image<Bgr, byte>(FILE_TEST_2);
+                //Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, new Bgr(Color.Green));
                 box_transformed.Image = Image_transformed.ToBitmap();
 
                 Filter();
@@ -83,8 +85,17 @@ namespace Pointboard
 
         private void Filter()
         {
-            //Get red
+            /*//Get red
             Image_filtered = Image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
+            box_filtered.Image = Image_filtered.ToBitmap();*/
+
+            Rectangle rect = new Rectangle(378, 301, 20, 20);
+            Hsv average = Image_transformed.GetSubRect(rect).Convert<Hsv, byte>().GetAverage();
+
+            Hsv threshold_lower = new Hsv(average.Hue -20, average.Satuation -20, average.Value -20);
+            Hsv threshold_higher = new Hsv(average.Hue +20, 255, 255);
+
+            Image_filtered = Image_transformed.Convert<Hsv, byte>().InRange(threshold_lower, threshold_higher);
             box_filtered.Image = Image_filtered.ToBitmap();
         }
 
@@ -157,6 +168,7 @@ namespace Pointboard
             //Mark first circle
             if (circles.Length > 0)
             {
+                lbl_info.Text = circles[0].Center.X.ToString() + " " + circles[0].Center.Y.ToString();
                 Pen pen_circle = new Pen(Color.Blue, 3);
                 float radius = circles[0].Radius + pen_circle.Width;
                 Drawings.DrawEllipse(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, radius * 2, radius * 2);
