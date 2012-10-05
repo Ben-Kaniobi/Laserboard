@@ -55,8 +55,26 @@ namespace Pointboard
             }
             catch
             {
-                lbl_info.Text = "Webcam not found";
+                Application.Idle += new EventHandler(Testmode);
+                lbl_info.Text = "Webcam not found. Using testmode";
             }            
+        }
+
+        private void Testmode(object sender, EventArgs e)
+        {
+            //Load and display test image
+            Image_transformed = new Image<Bgr, byte>(FILE_TEST_2);
+            box_transformed.Image = Image_transformed.ToBitmap();
+
+            //Clear box_final
+            box_final.Image = null;
+            box_final.BackColor = Color.Black;
+
+            Filter();
+
+            Find_point();
+
+            System.Threading.Thread.Sleep(500);
         }
 
         private void Show_cam(object sender, EventArgs e)
@@ -73,8 +91,7 @@ namespace Pointboard
             else
             {
                 //Transform and display image
-                Image_transformed = new Image<Bgr, byte>(FILE_TEST_2);
-                //Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, new Bgr(Color.Green));
+                Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, new Bgr(Color.Green));
                 box_transformed.Image = Image_transformed.ToBitmap();
 
                 Filter();
