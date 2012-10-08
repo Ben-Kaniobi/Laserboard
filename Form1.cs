@@ -20,7 +20,7 @@ namespace Pointboard
         //Constants
         const int N_CHESSFIELDS_X = 8;
         const int N_CHESSFIELDS_Y = 6;
-        const int OFFSET_CHESSBOARD = 5;
+        const int OFFSET_CHESSBOARD = 7;
         const string FILE_TEST = @"..\..\files\Test_image_black_red.png";
         const string FILE_TEST_2 = @"..\..\files\Screenshot.png";
 
@@ -92,7 +92,8 @@ namespace Pointboard
             else
             {
                 //Transform and display image
-                Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, new Bgr(Color.Green));
+                Bgr color_outside = new Bgr(Color.Red); //Detect/change later
+                Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, color_outside);
                 box_transformed.Image = Image_transformed.ToBitmap();
 
                 Filter();
@@ -103,18 +104,18 @@ namespace Pointboard
 
         private void Filter()
         {
-            /*//Get red
+            //Get red
             Image_filtered = Image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
-            box_filtered.Image = Image_filtered.ToBitmap();*/
+            box_filtered.Image = Image_filtered.ToBitmap();
 
-            Rectangle rect = new Rectangle(378, 301, 20, 20);
+            /*Rectangle rect = new Rectangle(378, 301, 20, 20);
             Hsv average = Image_transformed.GetSubRect(rect).Convert<Hsv, byte>().GetAverage();
 
             Hsv threshold_lower = new Hsv(average.Hue -20, average.Satuation -20, average.Value -20);
             Hsv threshold_higher = new Hsv(average.Hue +20, 255, 255);
 
             Image_filtered = Image_transformed.Convert<Hsv, byte>().InRange(threshold_lower, threshold_higher);
-            box_filtered.Image = Image_filtered.ToBitmap();
+            box_filtered.Image = Image_filtered.ToBitmap();*/
         }
 
         private void btn_Calibrate_Click(object sender, EventArgs e)
@@ -131,7 +132,7 @@ namespace Pointboard
             }
 
             //Display
-            //box_final.BackColor = Color.Black;
+            box_final.BackColor = Color.Black;
             box_final.Image = Image_chessboard.Resize(box_final.Width - 2 * OFFSET_CHESSBOARD, box_final.Height - 2 * OFFSET_CHESSBOARD, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC).ToBitmap();
 
             //Get corner-points of original and captured chessboard
@@ -146,7 +147,7 @@ namespace Pointboard
 
             //Clear box_final
             box_final.Image = null;
-            box_final.BackColor = Color.Black;
+            //box_final.BackColor = Color.Black;
 
             return true; //Successful
         }
