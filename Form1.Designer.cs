@@ -97,7 +97,7 @@
             this.box_final.Location = new System.Drawing.Point(12, 138);
             this.box_final.Name = "box_final";
             this.box_final.Size = new System.Drawing.Size(492, 369);
-            this.box_final.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.box_final.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.box_final.TabIndex = 2;
             this.box_final.TabStop = false;
             // 

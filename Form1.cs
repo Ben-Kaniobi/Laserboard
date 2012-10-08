@@ -20,6 +20,7 @@ namespace Pointboard
         //Constants
         const int N_CHESSFIELDS_X = 8;
         const int N_CHESSFIELDS_Y = 6;
+        const int OFFSET_CHESSBOARD = 5;
         const string FILE_TEST = @"..\..\files\Test_image_black_red.png";
         const string FILE_TEST_2 = @"..\..\files\Screenshot.png";
 
@@ -128,8 +129,10 @@ namespace Pointboard
                 //Load (with same size as original)
                 Image_chessboard = new Image<Gray, byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_original.Width, Image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
             }
+
             //Display
-            box_final.Image = Image_chessboard.ToBitmap();
+            //box_final.BackColor = Color.Black;
+            box_final.Image = Image_chessboard.Resize(box_final.Width - 2 * OFFSET_CHESSBOARD, box_final.Height - 2 * OFFSET_CHESSBOARD, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC).ToBitmap();
 
             //Get corner-points of original and captured chessboard
             Size size_p = new Size(N_CHESSFIELDS_X - 1, N_CHESSFIELDS_Y - 1);
