@@ -169,9 +169,11 @@ namespace Pointboard
 
         private void Find_point()
         {
-            //Get scale factors
-            Double factor_x = 1 - (Convert.ToDouble(box_original.Width) / Image_filtered.Width);
-            Double factor_y = 1 - (Convert.ToDouble(box_original.Height) / Image_filtered.Height);
+            float factor_x;
+            float factor_y;
+            float circle_x;
+            float circle_y;
+            float diameter;
 
             //Clear image
             if (box_final.Image != null)
@@ -192,18 +194,28 @@ namespace Pointboard
             2, //Min radius
             20 //Max radius
             )[0]; //Get the circles from the first channel
-            
+
             //Mark first circle
             if (circles.Length > 0)
             {
-                //lbl_info.Text = circles[0].Center.X.ToString() + " " + circles[0].Center.Y.ToString();
                 Pen pen_circle = new Pen(Color.Blue, 3);
 
-                float radius = circles[0].Radius + pen_circle.Width;
-                Rectangle rect = new Rectangle(Convert.ToInt32(factor_x * (circles[0].Center.X - circles[0].Radius)),
-                    Convert.ToInt32(factor_y * (circles[0].Center.Y - circles[0].Radius)),
-                    Convert.ToInt32(factor_x * radius * 2), Convert.ToInt32(factor_y * radius * 2));
-                Drawings.DrawEllipse(pen_circle, rect);//(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, radius * 2, radius * 2);
+                //Get scale factors
+                factor_x = (float)box_final.Width / Image_filtered.Width;
+                factor_y = (float)box_final.Height / Image_filtered.Height;
+
+                //Calculate coordinates and diameter
+                circle_x = circles[0].Center.X - circles[0].Radius;
+                circle_y = circles[0].Center.Y - circles[0].Radius;
+                diameter = 2 * (circles[0].Radius + pen_circle.Width);
+
+                //Convert coordinates for picturebox box_final
+                circle_x *= factor_x;
+                circle_y *= factor_y;
+
+                lbl_info.Text = circle_x.ToString() + " " + circle_y.ToString();
+
+                Drawings.DrawEllipse(pen_circle, circle_x, circle_y, diameter, diameter);
             }
 
             /*Mark multiple circles
