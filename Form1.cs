@@ -58,64 +58,7 @@ namespace Pointboard
             {
                 Application.Idle += new EventHandler(Testmode);
                 lbl_info.Text = "Webcam not found. Using testmode";
-            }            
-        }
-
-        private void Testmode(object sender, EventArgs e)
-        {
-            //Load and display test image
-            Image_transformed = new Image<Bgr, byte>(FILE_TEST_2);
-            box_transformed.Image = Image_transformed.ToBitmap();
-
-            //Clear box_final
-            box_final.Image = null;
-            box_final.BackColor = Color.Black;
-
-            Filter();
-
-            Find_point();
-
-            System.Threading.Thread.Sleep(500);
-        }
-
-        private void Show_cam(object sender, EventArgs e)
-        {
-            //Load and display Webcam-image in box_original
-            Image_original = Webcam.QueryFrame();
-            box_original.Image = Image_original.ToBitmap();
-
-            if (!Calibrated)
-            {
-                btn_Calibrate.Enabled = true;
-                Calibrated = Calibrate_perspective();
             }
-            else
-            {
-                //Transform and display image
-                Bgr color_outside = new Bgr(Color.Red); //Detect/change later
-                Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, color_outside);
-                box_transformed.Image = Image_transformed.ToBitmap();
-
-                Filter();
-
-                Find_point();
-            }
-        }
-
-        private void Filter()
-        {
-            //Get red
-            Image_filtered = Image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
-            box_filtered.Image = Image_filtered.ToBitmap();
-
-            /*Rectangle rect = new Rectangle(378, 301, 20, 20);
-            Hsv average = Image_transformed.GetSubRect(rect).Convert<Hsv, byte>().GetAverage();
-
-            Hsv threshold_lower = new Hsv(average.Hue -20, average.Satuation -20, average.Value -20);
-            Hsv threshold_higher = new Hsv(average.Hue +20, 255, 255);
-
-            Image_filtered = Image_transformed.Convert<Hsv, byte>().InRange(threshold_lower, threshold_higher);
-            box_filtered.Image = Image_filtered.ToBitmap();*/
         }
 
         private void btn_Calibrate_Click(object sender, EventArgs e)
@@ -152,6 +95,66 @@ namespace Pointboard
             return true; //Successful
         }
 
+        private void Testmode(object sender, EventArgs e)
+        {
+            box_original.BackColor = Color.Gray;
+
+            //Load and display test image
+            Image_transformed = new Image<Bgr, byte>(FILE_TEST_2);
+            box_transformed.Image = Image_transformed.ToBitmap();
+
+            //Clear box_final
+            box_final.Image = null;
+            box_final.BackColor = Color.Black;
+
+            Filter();
+
+            Find_point();
+
+            //Simulate 30Fps
+            System.Threading.Thread.Sleep(33);
+        }
+
+        private void Show_cam(object sender, EventArgs e)
+        {
+            //Load and display Webcam-image in box_original
+            Image_original = Webcam.QueryFrame();
+            box_original.Image = Image_original.ToBitmap();
+
+            if (!Calibrated)
+            {
+                btn_Calibrate.Enabled = true;
+                Calibrated = Calibrate_perspective();
+            }
+            else
+            {
+                //Transform and display image
+                Bgr color_outside = new Bgr(Color.Red); //Detect/change later
+                Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, color_outside);
+                box_transformed.Image = Image_transformed.ToBitmap();
+
+                Filter();
+
+                Find_point();
+            }
+        }
+
+        private void Filter()
+        {
+            //Get red
+            Image_filtered = Image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
+            box_filtered.Image = Image_filtered.ToBitmap();
+
+            /*Rectangle rect = new Rectangle(298, 324, 30, 30);
+            Hsv average = Image_transformed.GetSubRect(rect).Convert<Hsv, byte>().GetAverage();
+
+            Hsv threshold_lower = new Hsv(average.Hue -20, average.Satuation -20, average.Value -20);
+            Hsv threshold_higher = new Hsv(average.Hue +20, 255, 255);
+
+            Image_filtered = Image_transformed.Convert<Hsv, byte>().InRange(threshold_lower, threshold_higher);
+            box_filtered.Image = Image_filtered.ToBitmap();*/
+        }
+
         private void btn_Test_Click(object sender, EventArgs e)
         {
             if(File.Exists(FILE_TEST))
@@ -166,6 +169,10 @@ namespace Pointboard
 
         private void Find_point()
         {
+            //Get scale factors
+            Double factor_x = 1 - (Convert.ToDouble(box_original.Width) / Image_filtered.Width);
+            Double factor_y = 1 - (Convert.ToDouble(box_original.Height) / Image_filtered.Height);
+
             //Clear image
             if (box_final.Image != null)
             {
@@ -189,10 +196,14 @@ namespace Pointboard
             //Mark first circle
             if (circles.Length > 0)
             {
-                lbl_info.Text = circles[0].Center.X.ToString() + " " + circles[0].Center.Y.ToString();
+                //lbl_info.Text = circles[0].Center.X.ToString() + " " + circles[0].Center.Y.ToString();
                 Pen pen_circle = new Pen(Color.Blue, 3);
+
                 float radius = circles[0].Radius + pen_circle.Width;
-                Drawings.DrawEllipse(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, radius * 2, radius * 2);
+                Rectangle rect = new Rectangle(Convert.ToInt32(factor_x * (circles[0].Center.X - circles[0].Radius)),
+                    Convert.ToInt32(factor_y * (circles[0].Center.Y - circles[0].Radius)),
+                    Convert.ToInt32(factor_x * radius * 2), Convert.ToInt32(factor_y * radius * 2));
+                Drawings.DrawEllipse(pen_circle, rect);//(pen_circle, circles[0].Center.X - circles[0].Radius, circles[0].Center.Y - circles[0].Radius, radius * 2, radius * 2);
             }
 
             /*Mark multiple circles

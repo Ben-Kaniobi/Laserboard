@@ -1,7 +1,7 @@
 Laserboard
 ==========
 
-C# EmguCV project to use a laser pointer like a whiteboard-marker
+C# EmguCV project to use a laser pointer like a whiteboard marker using an ordinary webcam
 
 Screenshots
 -----------
