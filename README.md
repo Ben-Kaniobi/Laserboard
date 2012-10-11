@@ -1,7 +1,7 @@
 Laserboard
 ==========
 
-EmguCV-Project to use a laserpointer like a whiteboard-marker
+C# EmguCV project to use a laser pointer like a whiteboard-marker
 
 Screenshots
 -----------
@@ -12,6 +12,7 @@ Requirements
 * Microsoft .Net Framework
 * [EmguCV](http://sourceforge.net/projects/emgucv/)
 * Webcam
+* Laser pointer
 
 Download
 --------
