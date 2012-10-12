@@ -34,7 +34,6 @@
             this.btn_Calibrate = new System.Windows.Forms.Button();
             this.box_filtered = new System.Windows.Forms.PictureBox();
             this.box_final = new System.Windows.Forms.PictureBox();
-            this.btn_Test = new System.Windows.Forms.Button();
             this.sfd_Screenshot = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.box_original)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_transformed)).BeginInit();
@@ -101,16 +100,6 @@
             this.box_final.TabIndex = 2;
             this.box_final.TabStop = false;
             // 
-            // btn_Test
-            // 
-            this.btn_Test.Location = new System.Drawing.Point(429, 513);
-            this.btn_Test.Name = "btn_Test";
-            this.btn_Test.Size = new System.Drawing.Size(75, 23);
-            this.btn_Test.TabIndex = 6;
-            this.btn_Test.Text = "Test image";
-            this.btn_Test.UseVisualStyleBackColor = true;
-            this.btn_Test.Click += new System.EventHandler(this.btn_Test_Click);
-            // 
             // sfd_Screenshot
             // 
             this.sfd_Screenshot.DefaultExt = "png";
@@ -124,7 +113,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(516, 548);
-            this.Controls.Add(this.btn_Test);
             this.Controls.Add(this.btn_Calibrate);
             this.Controls.Add(this.box_final);
             this.Controls.Add(this.box_filtered);
@@ -155,7 +143,6 @@
         private System.Windows.Forms.Button btn_Calibrate;
         private System.Windows.Forms.PictureBox box_filtered;
         private System.Windows.Forms.PictureBox box_final;
-        private System.Windows.Forms.Button btn_Test;
         private System.Windows.Forms.SaveFileDialog sfd_Screenshot;
     }
 }

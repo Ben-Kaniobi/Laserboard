@@ -21,8 +21,7 @@ namespace Pointboard
         const int N_CHESSFIELDS_X = 8;
         const int N_CHESSFIELDS_Y = 6;
         const int OFFSET_CHESSBOARD = 7;
-        const string FILE_TEST = @"..\..\files\Test_image_black_red.png";
-        const string FILE_TEST_2 = @"..\..\files\Screenshot.png";
+        const string FILE_TEST = @"..\..\files\Screenshot.png";
 
         //Variables
         Image<Gray, Byte> Image_chessboard;
@@ -97,10 +96,16 @@ namespace Pointboard
 
         private void Testmode(object sender, EventArgs e)
         {
+            if (!File.Exists(FILE_TEST))
+            {
+                lbl_info.Text = "Webcam and test file not found.";
+                return;
+            }
+
             box_original.BackColor = Color.Gray;
 
             //Load and display test image
-            Image_transformed = new Image<Bgr, byte>(FILE_TEST_2);
+            Image_transformed = new Image<Bgr, byte>(FILE_TEST);
             box_transformed.Image = Image_transformed.ToBitmap();
 
             //Clear box_final
@@ -153,18 +158,6 @@ namespace Pointboard
 
             Image_filtered = Image_transformed.Convert<Hsv, byte>().InRange(threshold_lower, threshold_higher);
             box_filtered.Image = Image_filtered.ToBitmap();*/
-        }
-
-        private void btn_Test_Click(object sender, EventArgs e)
-        {
-            if(File.Exists(FILE_TEST))
-            {
-                box_final.Image = new Image<Bgr, byte>(FILE_TEST).ToBitmap();
-            }
-            else
-            {
-                lbl_info.Text = "Test-image not found";
-            }
         }
 
         private void Find_point()
