@@ -28,28 +28,28 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.box_original = new System.Windows.Forms.PictureBox();
+            this.box_webcam = new System.Windows.Forms.PictureBox();
             this.lbl_info = new System.Windows.Forms.Label();
             this.box_transformed = new System.Windows.Forms.PictureBox();
             this.btn_Calibrate = new System.Windows.Forms.Button();
             this.box_filtered = new System.Windows.Forms.PictureBox();
             this.box_final = new System.Windows.Forms.PictureBox();
             this.sfd_Screenshot = new System.Windows.Forms.SaveFileDialog();
-            ((System.ComponentModel.ISupportInitialize)(this.box_original)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.box_webcam)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_transformed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_filtered)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_final)).BeginInit();
             this.SuspendLayout();
             // 
-            // box_original
+            // box_webcam
             // 
-            this.box_original.Location = new System.Drawing.Point(12, 12);
-            this.box_original.Name = "box_original";
-            this.box_original.Size = new System.Drawing.Size(160, 120);
-            this.box_original.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.box_original.TabIndex = 0;
-            this.box_original.TabStop = false;
-            this.box_original.Click += new System.EventHandler(this.box_original_Click);
+            this.box_webcam.Location = new System.Drawing.Point(12, 12);
+            this.box_webcam.Name = "box_webcam";
+            this.box_webcam.Size = new System.Drawing.Size(160, 120);
+            this.box_webcam.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.box_webcam.TabIndex = 0;
+            this.box_webcam.TabStop = false;
+            this.box_webcam.Click += new System.EventHandler(this.box_original_Click);
             // 
             // lbl_info
             // 
@@ -118,7 +118,7 @@
             this.Controls.Add(this.box_filtered);
             this.Controls.Add(this.box_transformed);
             this.Controls.Add(this.lbl_info);
-            this.Controls.Add(this.box_original);
+            this.Controls.Add(this.box_webcam);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "frm_Main";
@@ -126,7 +126,7 @@
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frm_Pointboard_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.box_original)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.box_webcam)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_transformed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_filtered)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_final)).EndInit();
@@ -137,7 +137,7 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox box_original;
+        private System.Windows.Forms.PictureBox box_webcam;
         private System.Windows.Forms.Label lbl_info;
         private System.Windows.Forms.PictureBox box_transformed;
         private System.Windows.Forms.Button btn_Calibrate;

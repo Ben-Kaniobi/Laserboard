@@ -12,7 +12,6 @@ using System.Drawing.Drawing2D;
 using Emgu.CV;
 using Emgu.Util;
 using Emgu.CV.Structure;
-using Emgu.CV.UI;
 
 namespace Pointboard
 {
@@ -26,7 +25,7 @@ namespace Pointboard
 
         //Variables
         Image<Gray, Byte> Image_chessboard;
-        Image<Bgr, Byte> Image_original;
+        Image<Bgr, Byte> Image_webcam;
         Image<Bgr, Byte> Image_transformed;
         Image<Gray, Byte> Image_filtered;
         Graphics Drawings;
@@ -72,7 +71,7 @@ namespace Pointboard
             if (Image_chessboard == null)
             {//Chessboard-image not loaded yet
                 //Load (with same size as original)
-                Image_chessboard = new Image<Gray, Byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_original.Width, Image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+                Image_chessboard = new Image<Gray, Byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_webcam.Width, Image_webcam.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
             }
 
             //Display
@@ -83,7 +82,7 @@ namespace Pointboard
             Size size_p = new Size(N_CHESSFIELDS_X - 1, N_CHESSFIELDS_Y - 1);
             Emgu.CV.CvEnum.CALIB_CB_TYPE calibrations = Emgu.CV.CvEnum.CALIB_CB_TYPE.ADAPTIVE_THRESH | Emgu.CV.CvEnum.CALIB_CB_TYPE.NORMALIZE_IMAGE | Emgu.CV.CvEnum.CALIB_CB_TYPE.FILTER_QUADS;
             PointF[] corners_dst = CameraCalibration.FindChessboardCorners(Image_chessboard, size_p, calibrations);
-            PointF[] corners_src = CameraCalibration.FindChessboardCorners(Image_original.Convert<Gray, Byte>(), size_p, calibrations);
+            PointF[] corners_src = CameraCalibration.FindChessboardCorners(Image_webcam.Convert<Gray, Byte>(), size_p, calibrations);
             if (corners_src == null || corners_dst == null) return false; //Chessboard not found
 
             //Get matrix for transformation
@@ -104,7 +103,7 @@ namespace Pointboard
                 return;
             }
 
-            box_original.BackColor = Color.Gray;
+            box_webcam.BackColor = Color.Gray;
 
             //Load and display test image
             Image_transformed = new Image<Bgr, Byte>(FILE_TEST);
@@ -125,8 +124,8 @@ namespace Pointboard
         private void Show_cam(object sender, EventArgs e)
         {
             //Load and display Webcam-image in box_original
-            Image_original = Webcam.QueryFrame();
-            box_original.Image = Image_original.ToBitmap();
+            Image_webcam = Webcam.QueryFrame();
+            box_webcam.Image = Image_webcam.ToBitmap();
 
             if (!Calibrated)
             {
@@ -137,7 +136,7 @@ namespace Pointboard
             {
                 //Transform and display image
                 Bgr color_outside = new Bgr(Color.Red); //Detect/change later
-                Image_transformed = Image_original.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, color_outside);
+                Image_transformed = Image_webcam.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, color_outside);
                 box_transformed.Image = Image_transformed.ToBitmap();
 
                 Filter();
@@ -235,11 +234,12 @@ namespace Pointboard
             }*/
         }
 
-        private void box_filtered_Click(object sender, EventArgs e)
+        private void box_original_Click(object sender, EventArgs e)
         {
-            if (box_filtered.Image != null)
+            if (box_webcam.Image != null)
             {
-                sfd_Screenshot.Tag = box_filtered;
+                sfd_Screenshot.Tag = box_webcam;
+                sfd_Screenshot.FileName = "Screenshot_webcam";
                 sfd_Screenshot.ShowDialog();
             }
         }
@@ -249,32 +249,34 @@ namespace Pointboard
             if (box_transformed.Image != null)
             {
                 sfd_Screenshot.Tag = box_transformed;
+                sfd_Screenshot.FileName = "Screenshot_transformed";
                 sfd_Screenshot.ShowDialog();
             }
         }
 
-        private void box_original_Click(object sender, EventArgs e)
+        private void box_filtered_Click(object sender, EventArgs e)
         {
-            if (box_original.Image != null)
+            if (box_filtered.Image != null)
             {
-                sfd_Screenshot.Tag = box_original;
+                sfd_Screenshot.Tag = box_filtered;
+                sfd_Screenshot.FileName = "Screenshot_filtered";
                 sfd_Screenshot.ShowDialog();
             }
         }
 
         private void sfd_Screenshot_FileOk(object sender, CancelEventArgs e)
         {
-            if (sfd_Screenshot.Tag == box_filtered)
+            if (sfd_Screenshot.Tag == box_webcam)
             {
-                box_filtered.Image.Save(sfd_Screenshot.FileName);
+                box_webcam.Image.Save(sfd_Screenshot.FileName);
             }
             else if (sfd_Screenshot.Tag == box_transformed)
             {
                 box_transformed.Image.Save(sfd_Screenshot.FileName);
             }
-            else if (sfd_Screenshot.Tag == box_original)
+            else if (sfd_Screenshot.Tag == box_filtered)
             {
-                box_original.Image.Save(sfd_Screenshot.FileName);
+                box_filtered.Image.Save(sfd_Screenshot.FileName);
             }
         }
 
