@@ -12,6 +12,7 @@ using System.Drawing.Drawing2D;
 using Emgu.CV;
 using Emgu.Util;
 using Emgu.CV.Structure;
+using Emgu.CV.UI;
 
 namespace Pointboard
 {
@@ -55,8 +56,9 @@ namespace Pointboard
             }
             catch
             {
-                Application.Idle += new EventHandler(Testmode);
                 lbl_info.Text = "Webcam not found. Using testmode";
+                Calibrated = true;
+                Application.Idle += new EventHandler(Testmode);
             }
         }
 
@@ -150,11 +152,11 @@ namespace Pointboard
             Image_filtered = Image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
             box_filtered.Image = Image_filtered.ToBitmap();
 
-            /*Rectangle rect = new Rectangle(298, 324, 30, 30);
+            /*Rectangle rect = new Rectangle(300, 235, 25, 25);
             Hsv average = Image_transformed.GetSubRect(rect).Convert<Hsv, byte>().GetAverage();
 
-            Hsv threshold_lower = new Hsv(average.Hue -20, average.Satuation -20, average.Value -20);
-            Hsv threshold_higher = new Hsv(average.Hue +20, 255, 255);
+            Hsv threshold_lower = new Hsv(average.Hue -20, average.Satuation, average.Value);
+            Hsv threshold_higher = new Hsv(average.Hue +20, 200, 200);
 
             Image_filtered = Image_transformed.Convert<Hsv, byte>().InRange(threshold_lower, threshold_higher);
             box_filtered.Image = Image_filtered.ToBitmap();*/
