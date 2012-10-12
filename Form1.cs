@@ -72,7 +72,7 @@ namespace Pointboard
             if (Image_chessboard == null)
             {//Chessboard-image not loaded yet
                 //Load (with same size as original)
-                Image_chessboard = new Image<Gray, byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_original.Width, Image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+                Image_chessboard = new Image<Gray, Byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_original.Width, Image_original.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
             }
 
             //Display
@@ -107,7 +107,7 @@ namespace Pointboard
             box_original.BackColor = Color.Gray;
 
             //Load and display test image
-            Image_transformed = new Image<Bgr, byte>(FILE_TEST);
+            Image_transformed = new Image<Bgr, Byte>(FILE_TEST);
             box_transformed.Image = Image_transformed.ToBitmap();
 
             //Clear box_final
@@ -148,18 +148,24 @@ namespace Pointboard
 
         private void Filter()
         {
-            //Get red
+            /*//Get red
             Image_filtered = Image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
-            box_filtered.Image = Image_filtered.ToBitmap();
-
-            /*Rectangle rect = new Rectangle(300, 235, 25, 25);
-            Hsv average = Image_transformed.GetSubRect(rect).Convert<Hsv, byte>().GetAverage();
-
-            Hsv threshold_lower = new Hsv(average.Hue -20, average.Satuation, average.Value);
-            Hsv threshold_higher = new Hsv(average.Hue +20, 200, 200);
-
-            Image_filtered = Image_transformed.Convert<Hsv, byte>().InRange(threshold_lower, threshold_higher);
             box_filtered.Image = Image_filtered.ToBitmap();*/
+
+            //Get average color (HSV) of the point area
+            Rectangle rect = new Rectangle(300, 235, 25, 25); //Only for test image!
+            Hsv average = Image_transformed.GetSubRect(rect).Convert<Hsv, Byte>().GetAverage();
+
+            //Create thresholds
+            Hsv threshold_lower = new Hsv(average.Hue -25, 100, 100);
+            Hsv threshold_higher = new Hsv(average.Hue +25, 240, 240);
+
+            //Blur image and find colors between thresholds
+            Image_filtered = Image_transformed.Convert<Hsv, Byte>().SmoothBlur(20,20).InRange(threshold_lower, threshold_higher);
+
+            //Reduce size of the point and display image
+            Image_filtered = Image_filtered.Erode(4);
+            box_filtered.Image = Image_filtered.ToBitmap();
         }
 
         private void Find_point()
