@@ -31,14 +31,17 @@
             this.box_webcam = new System.Windows.Forms.PictureBox();
             this.lbl_info = new System.Windows.Forms.Label();
             this.box_transformed = new System.Windows.Forms.PictureBox();
-            this.btn_Calibrate = new System.Windows.Forms.Button();
+            this.btn_recalibrate_perspective = new System.Windows.Forms.Button();
             this.box_filtered = new System.Windows.Forms.PictureBox();
             this.box_final = new System.Windows.Forms.PictureBox();
-            this.sfd_Screenshot = new System.Windows.Forms.SaveFileDialog();
+            this.sfd_screenshot = new System.Windows.Forms.SaveFileDialog();
+            this.btn_calibrate_laser = new System.Windows.Forms.Button();
+            this.box_average = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.box_webcam)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_transformed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_filtered)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_final)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.box_average)).BeginInit();
             this.SuspendLayout();
             // 
             // box_webcam
@@ -50,11 +53,12 @@
             this.box_webcam.TabIndex = 0;
             this.box_webcam.TabStop = false;
             this.box_webcam.Click += new System.EventHandler(this.box_original_Click);
+            this.box_webcam.MouseEnter += new System.EventHandler(this.box_images_MouseEnter);
             // 
             // lbl_info
             // 
             this.lbl_info.AutoSize = true;
-            this.lbl_info.Location = new System.Drawing.Point(93, 518);
+            this.lbl_info.Location = new System.Drawing.Point(232, 518);
             this.lbl_info.Name = "lbl_info";
             this.lbl_info.Size = new System.Drawing.Size(25, 13);
             this.lbl_info.TabIndex = 1;
@@ -69,17 +73,19 @@
             this.box_transformed.TabIndex = 2;
             this.box_transformed.TabStop = false;
             this.box_transformed.Click += new System.EventHandler(this.box_transformed_Click);
+            this.box_transformed.MouseEnter += new System.EventHandler(this.box_images_MouseEnter);
             // 
-            // btn_Calibrate
+            // btn_recalibrate_perspective
             // 
-            this.btn_Calibrate.Enabled = false;
-            this.btn_Calibrate.Location = new System.Drawing.Point(12, 513);
-            this.btn_Calibrate.Name = "btn_Calibrate";
-            this.btn_Calibrate.Size = new System.Drawing.Size(75, 23);
-            this.btn_Calibrate.TabIndex = 5;
-            this.btn_Calibrate.Text = "Recalibrate";
-            this.btn_Calibrate.UseVisualStyleBackColor = true;
-            this.btn_Calibrate.Click += new System.EventHandler(this.btn_Calibrate_Click);
+            this.btn_recalibrate_perspective.Enabled = false;
+            this.btn_recalibrate_perspective.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_recalibrate_perspective.Location = new System.Drawing.Point(99, 513);
+            this.btn_recalibrate_perspective.Name = "btn_recalibrate_perspective";
+            this.btn_recalibrate_perspective.Size = new System.Drawing.Size(127, 23);
+            this.btn_recalibrate_perspective.TabIndex = 5;
+            this.btn_recalibrate_perspective.Text = "Recalibrate perspective";
+            this.btn_recalibrate_perspective.UseVisualStyleBackColor = true;
+            this.btn_recalibrate_perspective.Click += new System.EventHandler(this.btn_calibrate_perspective_Click);
             // 
             // box_filtered
             // 
@@ -90,35 +96,62 @@
             this.box_filtered.TabIndex = 2;
             this.box_filtered.TabStop = false;
             this.box_filtered.Click += new System.EventHandler(this.box_filtered_Click);
+            this.box_filtered.MouseEnter += new System.EventHandler(this.box_images_MouseEnter);
             // 
             // box_final
             // 
+            this.box_final.Cursor = System.Windows.Forms.Cursors.Default;
             this.box_final.Location = new System.Drawing.Point(12, 138);
             this.box_final.Name = "box_final";
             this.box_final.Size = new System.Drawing.Size(492, 369);
-            this.box_final.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.box_final.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.box_final.TabIndex = 2;
             this.box_final.TabStop = false;
+            this.box_final.MouseDown += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseDown);
+            this.box_final.MouseMove += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseMove);
+            this.box_final.MouseUp += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseUp);
             // 
-            // sfd_Screenshot
+            // sfd_screenshot
             // 
-            this.sfd_Screenshot.DefaultExt = "png";
-            this.sfd_Screenshot.FileName = "Screenshot";
-            this.sfd_Screenshot.Filter = "PNG-Image|*.png";
-            this.sfd_Screenshot.Title = "Save screenshot";
-            this.sfd_Screenshot.FileOk += new System.ComponentModel.CancelEventHandler(this.sfd_Screenshot_FileOk);
+            this.sfd_screenshot.DefaultExt = "png";
+            this.sfd_screenshot.FileName = "Screenshot";
+            this.sfd_screenshot.Filter = "PNG-Image|*.png";
+            this.sfd_screenshot.Title = "Save screenshot";
+            this.sfd_screenshot.FileOk += new System.ComponentModel.CancelEventHandler(this.sfd_Screenshot_FileOk);
+            // 
+            // btn_calibrate_laser
+            // 
+            this.btn_calibrate_laser.Enabled = false;
+            this.btn_calibrate_laser.Location = new System.Drawing.Point(12, 513);
+            this.btn_calibrate_laser.Name = "btn_calibrate_laser";
+            this.btn_calibrate_laser.Size = new System.Drawing.Size(81, 23);
+            this.btn_calibrate_laser.TabIndex = 6;
+            this.btn_calibrate_laser.Text = "Calibrate laser";
+            this.btn_calibrate_laser.UseVisualStyleBackColor = true;
+            this.btn_calibrate_laser.Click += new System.EventHandler(this.btn_calibrate_laser_Click);
+            // 
+            // box_average
+            // 
+            this.box_average.Location = new System.Drawing.Point(481, 513);
+            this.box_average.Name = "box_average";
+            this.box_average.Size = new System.Drawing.Size(23, 23);
+            this.box_average.TabIndex = 7;
+            this.box_average.TabStop = false;
             // 
             // frm_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(516, 548);
-            this.Controls.Add(this.btn_Calibrate);
+            this.Controls.Add(this.box_average);
+            this.Controls.Add(this.btn_calibrate_laser);
+            this.Controls.Add(this.btn_recalibrate_perspective);
             this.Controls.Add(this.box_final);
             this.Controls.Add(this.box_filtered);
             this.Controls.Add(this.box_transformed);
             this.Controls.Add(this.lbl_info);
             this.Controls.Add(this.box_webcam);
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "frm_Main";
@@ -130,6 +163,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.box_transformed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_filtered)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_final)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.box_average)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -140,10 +174,12 @@
         private System.Windows.Forms.PictureBox box_webcam;
         private System.Windows.Forms.Label lbl_info;
         private System.Windows.Forms.PictureBox box_transformed;
-        private System.Windows.Forms.Button btn_Calibrate;
+        private System.Windows.Forms.Button btn_recalibrate_perspective;
         private System.Windows.Forms.PictureBox box_filtered;
         private System.Windows.Forms.PictureBox box_final;
-        private System.Windows.Forms.SaveFileDialog sfd_Screenshot;
+        private System.Windows.Forms.SaveFileDialog sfd_screenshot;
+        private System.Windows.Forms.Button btn_calibrate_laser;
+        private System.Windows.Forms.PictureBox box_average;
     }
 }
 
