@@ -36,12 +36,10 @@
             this.box_final = new System.Windows.Forms.PictureBox();
             this.sfd_screenshot = new System.Windows.Forms.SaveFileDialog();
             this.btn_calibrate_laser = new System.Windows.Forms.Button();
-            this.box_average = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.box_webcam)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_transformed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_filtered)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_final)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.box_average)).BeginInit();
             this.SuspendLayout();
             // 
             // box_webcam
@@ -130,20 +128,11 @@
             this.btn_calibrate_laser.UseVisualStyleBackColor = true;
             this.btn_calibrate_laser.Click += new System.EventHandler(this.btn_calibrate_laser_Click);
             // 
-            // box_average
-            // 
-            this.box_average.Location = new System.Drawing.Point(481, 513);
-            this.box_average.Name = "box_average";
-            this.box_average.Size = new System.Drawing.Size(23, 23);
-            this.box_average.TabIndex = 7;
-            this.box_average.TabStop = false;
-            // 
             // frm_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(516, 548);
-            this.Controls.Add(this.box_average);
             this.Controls.Add(this.btn_calibrate_laser);
             this.Controls.Add(this.btn_recalibrate_perspective);
             this.Controls.Add(this.box_final);
@@ -163,7 +152,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.box_transformed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_filtered)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.box_final)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.box_average)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -179,7 +167,6 @@
         private System.Windows.Forms.PictureBox box_final;
         private System.Windows.Forms.SaveFileDialog sfd_screenshot;
         private System.Windows.Forms.Button btn_calibrate_laser;
-        private System.Windows.Forms.PictureBox box_average;
     }
 }
 

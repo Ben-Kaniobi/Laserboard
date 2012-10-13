@@ -181,7 +181,7 @@ namespace Pointboard
 
         private void box_final_MouseUp(object sender, MouseEventArgs e)
         {
-            if (!Marking_spot) return;
+            if (!Marking_spot) return; //Not in marking mode
             
             Mouse_down = false;
 
@@ -193,7 +193,7 @@ namespace Pointboard
             Spot.Width = (int)(factor_x * Spot.Width);
             Spot.Height = (int)(factor_y * Spot.Height);
 
-            //Get average color of the spot
+            //Get average color (HSV) of the spot
             Color_spot = Image_transformed.GetSubRect(Norm_rectangle(Spot)).Convert<Hsv, Byte>().GetAverage();
             //Reset spot position and size
             Spot = new Rectangle();
@@ -211,7 +211,7 @@ namespace Pointboard
 
         private void Testmode(object sender, EventArgs e)
         {
-            if (Marking_spot) return;
+            if (Marking_spot) return; //In marking mode
 
             if (!File.Exists(FILE_TEST))
             {
@@ -243,7 +243,7 @@ namespace Pointboard
 
         private void Show_cam(object sender, EventArgs e)
         {
-            if (Marking_spot) return;
+            if (Marking_spot) return; //In marking mode
 
             //Load and display Webcam-image in box_original
             Image_webcam = Webcam.QueryFrame();
@@ -273,15 +273,8 @@ namespace Pointboard
 
         private void Filter()
         {
-            /*//Get red
-            Image_filtered = Image_transformed.SmoothBlur(5, 5).InRange(new Bgr(Color.DarkRed), new Bgr(Color.White));//Color.FromArgb(255, 100, 100)));
-            box_filtered.Image = Image_filtered.ToBitmap();*/
-
             if (Calibrated_laser)
             {
-                /*//Get average color (HSV) of the spot area
-                Spot = new Rectangle(300, 235, 25, 25); //Only for test image!*/
-
                 //Create thresholds
                 Hsv threshold_lower = new Hsv(Color_spot.Hue - 25, 100, 100);
                 Hsv threshold_higher = new Hsv(Color_spot.Hue + 25, 240, 240);
@@ -355,6 +348,37 @@ namespace Pointboard
             }*/
         }
 
+        private void box_images_MouseEnter(object sender, EventArgs e)
+        {
+            //Handle cursors
+            if (box_webcam.Image != null)
+            {
+                box_webcam.Cursor = Cursors.Hand;
+            }
+            else
+            {
+                box_webcam.Cursor = Cursors.Default;
+            }
+
+            if (box_transformed.Image != null)
+            {
+                box_transformed.Cursor = Cursors.Hand;
+            }
+            else
+            {
+                box_transformed.Cursor = Cursors.Default;
+            }
+
+            if (box_filtered.Image != null)
+            {
+                box_filtered.Cursor = Cursors.Hand;
+            }
+            else
+            {
+                box_filtered.Cursor = Cursors.Default;
+            }
+        }
+
         private void box_original_Click(object sender, EventArgs e)
         {
             if (box_webcam.Image != null)
@@ -404,37 +428,6 @@ namespace Pointboard
         private void frm_Pointboard_FormClosing(object sender, FormClosingEventArgs e)
         {
             Dispose();
-        }
-
-        private void box_images_MouseEnter(object sender, EventArgs e)
-        {
-            //Handle cursors
-            if (box_webcam.Image != null)
-            {
-                box_webcam.Cursor = Cursors.Hand;
-            }
-            else
-            {
-                box_webcam.Cursor = Cursors.Default;
-            }
-
-            if (box_transformed.Image != null)
-            {
-                box_transformed.Cursor = Cursors.Hand;
-            }
-            else
-            {
-                box_transformed.Cursor = Cursors.Default;
-            }
-
-            if (box_filtered.Image != null)
-            {
-                box_filtered.Cursor = Cursors.Hand;
-            }
-            else
-            {
-                box_filtered.Cursor = Cursors.Default;
-            }
         }
     }
 }
