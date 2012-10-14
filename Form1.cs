@@ -76,7 +76,7 @@ namespace Pointboard
             if (Image_chessboard == null)
             {//Chessboard-image not loaded yet
                 //Load (with same size as original)
-                Image_chessboard = new Image<Gray, Byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_webcam.Width, Image_webcam.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC);
+                Image_chessboard = new Image<Gray, Byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_webcam.Width, Image_webcam.Height, Emgu.CV.CvEnum.INTER.CV_INTER_AREA);
             }
 
             //Display
