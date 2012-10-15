@@ -13,10 +13,15 @@ using Emgu.CV;
 using Emgu.Util;
 using Emgu.CV.Structure;
 
-namespace Pointboard
+namespace Laserboard
 {
-    public partial class frm_Main : Form
+    public partial class Form1 : Form
     {
+        //Forms
+        Form2 frm_webcam = new Form2();
+        Form2 frm_transformed = new Form2();
+        Form2 frm_filtered = new Form2();
+
         //Constants
         const int N_CHESSFIELDS_X = 8;
         const int N_CHESSFIELDS_Y = 6;
@@ -39,19 +44,26 @@ namespace Pointboard
 
         HomographyMatrix Transformation_matrix;
 
-        public frm_Main()
+        public Form1()
         {
             InitializeComponent();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            frm_webcam.Text = "Webcam";
+            frm_transformed.Text = "Transformed";
+            frm_filtered.Text = "Filtered";
+            frm_webcam.Show();
+            frm_transformed.Show();
+            frm_filtered.Show();
+
             lbl_info.Text = "";
 
             //Create graphics to draw on box_final
             Drawings = box_final.CreateGraphics();
             Drawings.SmoothingMode = SmoothingMode.AntiAlias;
-            
+
             try
             {
                 //Capture Webcam
@@ -66,7 +78,7 @@ namespace Pointboard
             }
         }
 
-        private void btn_calibrate_perspective_Click(object sender, EventArgs e)
+        private void btn_recalibrate_perspective_Click(object sender, EventArgs e)
         {
             Calibrated_perspective = Calibrate_perspective();
         }
@@ -76,14 +88,14 @@ namespace Pointboard
             if (Image_chessboard == null)
             {//Chessboard-image not loaded yet
                 //Load (with same size as original)
-                Image_chessboard = new Image<Gray, Byte>(Laserboard.Properties.Resources.Chessboard).Resize(Image_webcam.Width, Image_webcam.Height, Emgu.CV.CvEnum.INTER.CV_INTER_AREA);
+                Image_chessboard = new Image<Gray, Byte>(Properties.Resources.Chessboard).Resize(Image_webcam.Width, Image_webcam.Height, Emgu.CV.CvEnum.INTER.CV_INTER_AREA);
             }
 
             //Display
             box_final.BackColor = Color.Black;
             box_final.SizeMode = PictureBoxSizeMode.CenterImage;
             box_final.Image = Image_chessboard.Resize(box_final.Width - 2 * OFFSET_CHESSBOARD, box_final.Height - 2 * OFFSET_CHESSBOARD, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC).ToBitmap();
-            
+
             //Get corner-points of original and captured chessboard
             Size size_p = new Size(N_CHESSFIELDS_X - 1, N_CHESSFIELDS_Y - 1);
             Emgu.CV.CvEnum.CALIB_CB_TYPE calibrations = Emgu.CV.CvEnum.CALIB_CB_TYPE.ADAPTIVE_THRESH | Emgu.CV.CvEnum.CALIB_CB_TYPE.NORMALIZE_IMAGE | Emgu.CV.CvEnum.CALIB_CB_TYPE.FILTER_QUADS;
@@ -182,7 +194,7 @@ namespace Pointboard
         private void box_final_MouseUp(object sender, MouseEventArgs e)
         {
             if (!Marking_spot) return; //Not in marking mode
-            
+
             Mouse_down = false;
 
             //Get scale factors
@@ -203,7 +215,7 @@ namespace Pointboard
             Drawings.Clear(box_final.BackColor);
             box_final.Cursor = Cursors.Default;
             Marking_spot = false;
-            
+
             btn_calibrate_laser.Enabled = true;
             btn_recalibrate_perspective.Enabled = true;
             Calibrated_laser = true;
@@ -219,11 +231,11 @@ namespace Pointboard
                 return;
             }
 
-            box_webcam.BackColor = Color.Gray;
+            frm_webcam.box_image.BackColor = Color.Gray;
 
             //Load and display test image
             Image_transformed = new Image<Bgr, Byte>(FILE_TEST);
-            box_transformed.Image = Image_transformed.ToBitmap();
+            frm_transformed.box_image.Image = Image_transformed.ToBitmap();
 
             //Clear box_final
             box_final.Image = null;
@@ -247,14 +259,14 @@ namespace Pointboard
 
             //Load and display Webcam-image in box_original
             Image_webcam = Webcam.QueryFrame();
-            box_webcam.Image = Image_webcam.ToBitmap();
+            frm_webcam.box_image.Image = Image_webcam.ToBitmap();
 
             if (Calibrated_perspective)
             {
                 //Transform and display image
                 Bgr color_outside = new Bgr(Color.Red); //Detect/change later
                 Image_transformed = Image_webcam.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, color_outside);
-                box_transformed.Image = Image_transformed.ToBitmap();
+                frm_transformed.box_image.Image = Image_transformed.ToBitmap();
 
                 btn_calibrate_laser.Enabled = true;
 
@@ -267,7 +279,7 @@ namespace Pointboard
             else
             {
                 Calibrated_perspective = Calibrate_perspective();
-                if(Calibrated_perspective) btn_recalibrate_perspective.Enabled = true;
+                if (Calibrated_perspective) btn_recalibrate_perspective.Enabled = true;
             }
         }
 
@@ -284,7 +296,7 @@ namespace Pointboard
 
                 //Reduce size of the spot and display image
                 Image_filtered = Image_filtered.Erode(4);
-                box_filtered.Image = Image_filtered.ToBitmap();
+                frm_filtered.box_image.Image = Image_filtered.ToBitmap();
             }
         }
 
@@ -348,84 +360,7 @@ namespace Pointboard
             }*/
         }
 
-        private void box_images_MouseEnter(object sender, EventArgs e)
-        {
-            //Handle cursors
-            if (box_webcam.Image != null)
-            {
-                box_webcam.Cursor = Cursors.Hand;
-            }
-            else
-            {
-                box_webcam.Cursor = Cursors.Default;
-            }
-
-            if (box_transformed.Image != null)
-            {
-                box_transformed.Cursor = Cursors.Hand;
-            }
-            else
-            {
-                box_transformed.Cursor = Cursors.Default;
-            }
-
-            if (box_filtered.Image != null)
-            {
-                box_filtered.Cursor = Cursors.Hand;
-            }
-            else
-            {
-                box_filtered.Cursor = Cursors.Default;
-            }
-        }
-
-        private void box_original_Click(object sender, EventArgs e)
-        {
-            if (box_webcam.Image != null)
-            {
-                sfd_screenshot.Tag = box_webcam;
-                sfd_screenshot.FileName = "Screenshot_webcam";
-                sfd_screenshot.ShowDialog();
-            }
-        }
-
-        private void box_transformed_Click(object sender, EventArgs e)
-        {
-            if (box_transformed.Image != null)
-            {
-                sfd_screenshot.Tag = box_transformed;
-                sfd_screenshot.FileName = "Screenshot_transformed";
-                sfd_screenshot.ShowDialog();
-            }
-        }
-
-        private void box_filtered_Click(object sender, EventArgs e)
-        {
-            if (box_filtered.Image != null)
-            {
-                sfd_screenshot.Tag = box_filtered;
-                sfd_screenshot.FileName = "Screenshot_filtered";
-                sfd_screenshot.ShowDialog();
-            }
-        }
-
-        private void sfd_Screenshot_FileOk(object sender, CancelEventArgs e)
-        {
-            if (sfd_screenshot.Tag == box_webcam)
-            {
-                box_webcam.Image.Save(sfd_screenshot.FileName);
-            }
-            else if (sfd_screenshot.Tag == box_transformed)
-            {
-                box_transformed.Image.Save(sfd_screenshot.FileName);
-            }
-            else if (sfd_screenshot.Tag == box_filtered)
-            {
-                box_filtered.Image.Save(sfd_screenshot.FileName);
-            }
-        }
-
-        private void frm_Pointboard_FormClosing(object sender, FormClosingEventArgs e)
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Dispose();
         }
