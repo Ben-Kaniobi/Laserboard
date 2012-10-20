@@ -91,7 +91,7 @@ namespace Laserboard
                 Image_chessboard = new Image<Gray, Byte>(Properties.Resources.Chessboard).Resize(Image_webcam.Width, Image_webcam.Height, Emgu.CV.CvEnum.INTER.CV_INTER_AREA);
             }
 
-            //Display
+            //Display chessboard
             box_final.BackColor = Color.Black;
             box_final.SizeMode = PictureBoxSizeMode.CenterImage;
             box_final.Image = Image_chessboard.Resize(box_final.Width - 2 * OFFSET_CHESSBOARD, box_final.Height - 2 * OFFSET_CHESSBOARD, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC).ToBitmap();
@@ -233,9 +233,8 @@ namespace Laserboard
 
             frm_webcam.box_image.BackColor = Color.Gray;
 
-            //Load and display test image
+            //Load test image
             Image_transformed = new Image<Bgr, Byte>(FILE_TEST);
-            frm_transformed.box_image.Image = Image_transformed.ToBitmap();
 
             //Clear box_final
             box_final.Image = null;
@@ -249,6 +248,11 @@ namespace Laserboard
                 Find_point();
             }
 
+            //Display images
+            if (Image_webcam != null) frm_webcam.box_image.Image = Image_webcam.ToBitmap();
+            if (Image_transformed != null) frm_transformed.box_image.Image = Image_transformed.ToBitmap();
+            if (Image_filtered != null) frm_filtered.box_image.Image = Image_filtered.ToBitmap();
+
             //Simulate 30Fps
             System.Threading.Thread.Sleep(33);
         }
@@ -257,16 +261,14 @@ namespace Laserboard
         {
             if (Marking_spot) return; //In marking mode
 
-            //Load and display Webcam-image in box_original
+            //Load  webcam image
             Image_webcam = Webcam.QueryFrame();
-            frm_webcam.box_image.Image = Image_webcam.ToBitmap();
 
             if (Calibrated_perspective)
             {
-                //Transform and display image
+                //Transform image
                 Bgr color_outside = new Bgr(Color.Red); //Detect/change later
                 Image_transformed = Image_webcam.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, color_outside);
-                frm_transformed.box_image.Image = Image_transformed.ToBitmap();
 
                 btn_calibrate_laser.Enabled = true;
 
@@ -281,23 +283,24 @@ namespace Laserboard
                 Calibrated_perspective = Calibrate_perspective();
                 if (Calibrated_perspective) btn_recalibrate_perspective.Enabled = true;
             }
+
+            //Display images
+            if (Image_webcam != null) frm_webcam.box_image.Image = Image_webcam.ToBitmap();
+            if (Image_transformed != null) frm_transformed.box_image.Image = Image_transformed.ToBitmap();
+            if (Image_filtered != null) frm_filtered.box_image.Image = Image_filtered.ToBitmap();
         }
 
         private void Filter()
         {
-            if (Calibrated_laser)
-            {
-                //Create thresholds
-                Hsv threshold_lower = new Hsv(Color_spot.Hue - 25, 100, 100);
-                Hsv threshold_higher = new Hsv(Color_spot.Hue + 25, 240, 240);
+            //Create thresholds
+            Hsv threshold_lower = new Hsv(Color_spot.Hue - 25, 100, 100);
+            Hsv threshold_higher = new Hsv(Color_spot.Hue + 25, 240, 240);
 
-                //Blur image and find colors between thresholds
-                Image_filtered = Image_transformed.Convert<Hsv, Byte>().SmoothBlur(20, 20).InRange(threshold_lower, threshold_higher);
+            //Blur image and find colors between thresholds
+            Image_filtered = Image_transformed.Convert<Hsv, Byte>().SmoothBlur(20, 20).InRange(threshold_lower, threshold_higher);
 
-                //Reduce size of the spot and display image
-                Image_filtered = Image_filtered.Erode(4);
-                frm_filtered.box_image.Image = Image_filtered.ToBitmap();
-            }
+            //Reduce size of the spot
+            Image_filtered = Image_filtered.Erode(4);
         }
 
         private void Find_point()
