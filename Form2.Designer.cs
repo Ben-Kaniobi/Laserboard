@@ -52,6 +52,7 @@
             this.sfd_screenshot.FileName = "Screenshot";
             this.sfd_screenshot.Filter = "PNG-Image|*.png";
             this.sfd_screenshot.Title = "Save screenshot";
+            this.sfd_screenshot.FileOk += new System.ComponentModel.CancelEventHandler(this.sfd_Screenshot_FileOk);
             // 
             // Form2
             // 
