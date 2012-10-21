@@ -58,6 +58,18 @@ namespace Laserboard
             frm_transformed.Show();
             frm_filtered.Show();
 
+            //Positions
+            if (frm_webcam.Location.X + frm_webcam.Width + frm_transformed.Width < Screen.PrimaryScreen.Bounds.Width)
+            {
+                //frm_transformed.StartPosition = FormStartPosition.Manual;
+                frm_transformed.Location = new Point(frm_webcam.Location.X + frm_webcam.Width, frm_webcam.Location.Y);
+            }
+            if (frm_transformed.Location.X + frm_transformed.Width + frm_filtered.Width < Screen.PrimaryScreen.Bounds.Width)
+            {
+                //frm_filtered.StartPosition = FormStartPosition.Manual;
+                frm_filtered.Location = new Point(frm_transformed.Location.X + frm_transformed.Width, frm_transformed.Location.Y);
+            }
+
             lbl_info.Text = "";
 
             //Create graphics to draw on box_final
@@ -249,9 +261,9 @@ namespace Laserboard
             }
 
             //Display images
-            if (Image_webcam != null) frm_webcam.box_image.Image = Image_webcam.ToBitmap();
-            if (Image_transformed != null) frm_transformed.box_image.Image = Image_transformed.ToBitmap();
-            if (Image_filtered != null) frm_filtered.box_image.Image = Image_filtered.ToBitmap();
+            if (Image_webcam != null)frm_webcam.box_image.Image = Image_webcam.ToBitmap();
+            if (Image_transformed != null)frm_transformed.box_image.Image = Image_transformed.ToBitmap();
+            if (Image_filtered != null)frm_filtered.box_image.Image = Image_filtered.ToBitmap();
 
             //Simulate 30Fps
             System.Threading.Thread.Sleep(33);

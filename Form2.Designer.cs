@@ -62,6 +62,7 @@
             this.Controls.Add(this.box_image);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "Form2";
+            this.ShowInTaskbar = false;
             this.Text = "Form2";
             ((System.ComponentModel.ISupportInitialize)(this.box_image)).EndInit();
             this.ResumeLayout(false);
