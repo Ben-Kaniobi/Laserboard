@@ -257,7 +257,7 @@ namespace Laserboard
             if (Calibrated_laser)
             {
                 Filter();
-                Find_point();
+                Draw(Find_point());
             }
 
             //Display images
@@ -287,7 +287,7 @@ namespace Laserboard
                 if (Calibrated_laser)
                 {
                     Filter();
-                    Find_point();
+                    Draw(Find_point());
                 }
             }
             else
@@ -315,17 +315,8 @@ namespace Laserboard
             Image_filtered = Image_filtered.Erode(4);
         }
 
-        private void Find_point()
+        private CircleF Find_point()
         {
-            float factor_x;
-            float factor_y;
-            float circle_x;
-            float circle_y;
-            float diameter;
-
-            //Clear image
-            Drawings.Clear(box_final.BackColor);
-
             //Find Circles
             CircleF[] circles = Image_filtered.HoughCircles(
             new Gray(180), //The higher threshold of the two passed to Canny edge detector (the lower one will be twice smaller)
@@ -336,28 +327,43 @@ namespace Laserboard
             20 //Max radius
             )[0]; //Get the circles from the first channel
 
-            //Mark first circle
-            if (circles.Length > 0)
-            {
-                Pen pen_circle = new Pen(Color.Blue, 3);
+            //Return first circle
+            if (circles.Length > 0) return circles[0];
 
-                //Get scale factors
-                factor_x = (float)box_final.Width / Image_filtered.Width;
-                factor_y = (float)box_final.Height / Image_filtered.Height;
+            return new CircleF(new Point(-1, -1), -1); //No circle
+        }
 
-                //Calculate coordinates and diameter
-                circle_x = circles[0].Center.X - circles[0].Radius;
-                circle_y = circles[0].Center.Y - circles[0].Radius;
-                diameter = 2 * (circles[0].Radius + pen_circle.Width);
+        private void Draw(CircleF circle)
+        {
+            //Clear image
+            Drawings.Clear(box_final.BackColor);
 
-                //Convert coordinates for picturebox box_final
-                circle_x *= factor_x;
-                circle_y *= factor_y;
+            if (circle.Center.X == -1 && circle.Center.Y == -1 && circle.Radius == -1) return; //No circle
 
-                lbl_info.Text = circle_x.ToString() + " " + circle_y.ToString();
+            float factor_x;
+            float factor_y;
+            float circle_x;
+            float circle_y;
+            float diameter;
 
-                Drawings.DrawEllipse(pen_circle, circle_x, circle_y, diameter, diameter);
-            }
+            Pen pen_circle = new Pen(Color.DarkBlue, 3);
+
+            //Get scale factors
+            factor_x = (float)box_final.Width / Image_filtered.Width;
+            factor_y = (float)box_final.Height / Image_filtered.Height;
+
+            //Calculate coordinates and diameter
+            circle_x = circle.Center.X - circle.Radius;
+            circle_y = circle.Center.Y - circle.Radius;
+            diameter = 2 * (circle.Radius + pen_circle.Width);
+
+            //Convert coordinates for picturebox box_final
+            circle_x *= factor_x;
+            circle_y *= factor_y;
+
+            lbl_info.Text = circle_x.ToString() + " " + circle_y.ToString();
+
+            Drawings.DrawEllipse(pen_circle, circle_x, circle_y, diameter, diameter);
 
             /*Mark multiple circles
             //int circle_number = 0;
