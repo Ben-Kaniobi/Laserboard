@@ -347,13 +347,17 @@ namespace Laserboard
             if (circles.Length > 0)
             {
                 //Get subpicture with laser
-                Image_laser = Image_transformed.GetSubRect(new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter));
+                Image_laser = Image_transformed.GetSubRect(new Rectangle((int)circle_x-10, (int)circle_y-10, (int)diameter+20, (int)diameter+20));
+                //Draw rectangle
+                Image_laser.DrawPolyline(new Point[] { new Point(10, 10), new Point((int)diameter + 10, 10) }, true, new Bgr(Color.Red), 1); //Top
+                Image_laser.DrawPolyline(new Point[] { new Point(10, 10), new Point(10, (int)diameter + 10) }, true, new Bgr(Color.Red), 1); //Left
+                Image_laser.DrawPolyline(new Point[] { new Point(10, (int)diameter + 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Red), 1); //Bottom
+                Image_laser.DrawPolyline(new Point[] { new Point((int)diameter + 10, 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Red), 1); //Right
                 //Return circle as Rectangle
                 return new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter);
             }
-
             //No circle
-            return new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter);
+            return new Rectangle(-1, -1, -1, -1);
         }
 
         private void Draw(Rectangle circle)
