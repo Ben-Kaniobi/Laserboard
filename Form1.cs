@@ -21,6 +21,7 @@ namespace Laserboard
         Form2 frm_webcam = new Form2();
         Form2 frm_transformed = new Form2();
         Form2 frm_filtered = new Form2();
+        Form2 frm_laser = new Form2();
 
         //Constants
         const int N_CHESSFIELDS_X = 8;
@@ -33,6 +34,7 @@ namespace Laserboard
         Image<Bgr, Byte> Image_webcam;
         Image<Bgr, Byte> Image_transformed;
         Image<Gray, Byte> Image_filtered;
+        Image<Bgr, Byte> Image_laser;
         Graphics Drawings;
         Capture Webcam;
         bool Calibrated_perspective = false;
@@ -52,11 +54,15 @@ namespace Laserboard
         private void Form1_Load(object sender, EventArgs e)
         {
             frm_webcam.Text = "Webcam";
-            frm_transformed.Text = "Transformed";
-            frm_filtered.Text = "Filtered";
             frm_webcam.Show();
+            frm_transformed.Text = "Transformed";
             frm_transformed.Show();
+            frm_filtered.Text = "Filtered";
             frm_filtered.Show();
+            frm_laser.Text = "Laser";
+            //frm_laser.box_image.SizeMode = PictureBoxSizeMode.CenterImage;
+            frm_laser.Show();
+
 
             //Positions
             if (frm_webcam.Location.X + frm_webcam.Width + frm_transformed.Width < Screen.PrimaryScreen.Bounds.Width)
@@ -264,6 +270,7 @@ namespace Laserboard
             if (Image_webcam != null) frm_webcam.box_image.Image = Image_webcam.ToBitmap();
             if (Image_transformed != null) frm_transformed.box_image.Image = Image_transformed.ToBitmap();
             if (Image_filtered != null) frm_filtered.box_image.Image = Image_filtered.ToBitmap();
+            if (Image_laser != null) frm_laser.box_image.Image = Image_laser.ToBitmap();
 
             //Simulate 30Fps
             System.Threading.Thread.Sleep(33);
@@ -300,6 +307,7 @@ namespace Laserboard
             if (Image_webcam != null) frm_webcam.box_image.Image = Image_webcam.ToBitmap();
             if (Image_transformed != null) frm_transformed.box_image.Image = Image_transformed.ToBitmap();
             if (Image_filtered != null) frm_filtered.box_image.Image = Image_filtered.ToBitmap();
+            if (Image_laser != null) frm_laser.box_image.Image = Image_laser.ToBitmap();
         }
 
         private void Filter()
@@ -315,8 +323,12 @@ namespace Laserboard
             Image_filtered = Image_filtered.Erode(4);
         }
 
-        private CircleF Find_point()
+        private Rectangle Find_point()
         {
+            float circle_x;
+            float circle_y;
+            float diameter;
+
             //Find Circles
             CircleF[] circles = Image_filtered.HoughCircles(
             new Gray(180), //The higher threshold of the two passed to Canny edge detector (the lower one will be twice smaller)
@@ -327,35 +339,37 @@ namespace Laserboard
             20 //Max radius
             )[0]; //Get the circles from the first channel
 
-            //Return first circle
-            if (circles.Length > 0) return circles[0];
+            //Calculate coordinates and diameter of first circle
+            circle_x = circles[0].Center.X - circles[0].Radius;
+            circle_y = circles[0].Center.Y - circles[0].Radius;
+            diameter = 2 * circles[0].Radius;
 
-            return new CircleF(new Point(-1, -1), -1); //No circle
+            if (circles.Length > 0)
+            {
+                //Get subpicture with laser
+                Image_laser = Image_transformed.GetSubRect(new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter));
+                //Return circle as Rectangle
+                return new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter);
+            }
+
+            //No circle
+            return new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter);
         }
 
-        private void Draw(CircleF circle)
+        private void Draw(Rectangle circle)
         {
             //Clear image
             Drawings.Clear(box_final.BackColor);
 
-            if (circle.Center.X == -1 && circle.Center.Y == -1 && circle.Radius == -1) return; //No circle
-
-            float factor_x;
-            float factor_y;
-            float circle_x;
-            float circle_y;
-            float diameter;
+            if (circle.X == -1 && circle.Y == -1 && circle.Width == -1 && circle.Height == -1) return; //No circle
 
             Pen pen_circle = new Pen(Color.DarkBlue, 3);
 
             //Get scale factors
-            factor_x = (float)box_final.Width / Image_filtered.Width;
-            factor_y = (float)box_final.Height / Image_filtered.Height;
-
-            //Calculate coordinates and diameter
-            circle_x = circle.Center.X - circle.Radius;
-            circle_y = circle.Center.Y - circle.Radius;
-            diameter = 2 * (circle.Radius + pen_circle.Width);
+            float circle_x = circle.X;
+            float circle_y = circle.Y;
+            float factor_x = (float)box_final.Width / Image_filtered.Width;
+            float factor_y = (float)box_final.Height / Image_filtered.Height;
 
             //Convert coordinates for picturebox box_final
             circle_x *= factor_x;
@@ -363,7 +377,7 @@ namespace Laserboard
 
             lbl_info.Text = circle_x.ToString() + " " + circle_y.ToString();
 
-            Drawings.DrawEllipse(pen_circle, circle_x, circle_y, diameter, diameter);
+            Drawings.DrawEllipse(pen_circle, circle_x, circle_y, circle.Width + pen_circle.Width, circle.Height + pen_circle.Width);
 
             /*Mark multiple circles
             //int circle_number = 0;
