@@ -348,15 +348,19 @@ namespace Laserboard
                 circle_y = circles[0].Center.Y - circles[0].Radius;
                 diameter = 2 * circles[0].Radius;
 
-                // Get subpicture with laser
-                Image_laser = Image_transformed.GetSubRect(new Rectangle((int)circle_x-10, (int)circle_y-10, (int)diameter+20, (int)diameter+20));
-                // Draw rectangle
-                Image_laser.DrawPolyline(new Point[] { new Point(10, 10), new Point((int)diameter + 10, 10) }, true, new Bgr(Color.Blue), 1); // Top
-                Image_laser.DrawPolyline(new Point[] { new Point(10, 10), new Point(10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Left
-                Image_laser.DrawPolyline(new Point[] { new Point(10, (int)diameter + 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Bottom
-                Image_laser.DrawPolyline(new Point[] { new Point((int)diameter + 10, 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Right
-                // Stretch image 10 times because it's not possible to set interpolation method for picturebox
-                Image_laser = Image_laser.Resize(10, Emgu.CV.CvEnum.INTER.CV_INTER_AREA);
+                //try // SubRect may be outside of image
+                //{
+                    // Get subpicture with laser
+                    Image_laser = Image_transformed.GetSubRect(new Rectangle((int)circle_x - 10, (int)circle_y - 10, (int)diameter + 20, (int)diameter + 20));
+                    // Draw rectangle
+                    Image_laser.DrawPolyline(new Point[] { new Point(10, 10), new Point((int)diameter + 10, 10) }, true, new Bgr(Color.Blue), 1); // Top
+                    Image_laser.DrawPolyline(new Point[] { new Point(10, 10), new Point(10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Left
+                    Image_laser.DrawPolyline(new Point[] { new Point(10, (int)diameter + 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Bottom
+                    Image_laser.DrawPolyline(new Point[] { new Point((int)diameter + 10, 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Right
+                    // Stretch image 10 times because it's not possible to set interpolation method for picturebox
+                    Image_laser = Image_laser.Resize(10, Emgu.CV.CvEnum.INTER.CV_INTER_AREA);
+                //}
+                //catch { }
 
                 // Return circle as Rectangle
                 return new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter);
