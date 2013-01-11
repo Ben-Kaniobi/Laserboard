@@ -29,6 +29,12 @@ namespace Laserboard
         const int OFFSET_CHESSBOARD = 7;                            // Width of black frame around chessboard
         const string FILE_TEST = @"..\..\files\Screenshot.png";     // Testfile when no webcam was found
 
+        // Flags
+        bool Calibrated_perspective = false;                        // Indicates if perspective already is calibrated
+        bool Calibrated_laser = false;                              // Indicates if laser already is calibrated
+        bool Marking_spot = false;                                  // Indicates if program currently is in laser marking mode (selecting spot for calibrating laser)
+        bool Mouse_down = false;                                    // Indicates if mouse button is down, used for laser marking mode
+
         // Variables
         Capture Webcam;                                             // Webcam
         Image<Gray, Byte> Image_chessboard;                         // Image with chessboard
@@ -38,10 +44,6 @@ namespace Laserboard
         Image<Bgr, Byte> Image_laser;                               // Image with current laser spot
         Graphics Drawings;                                          // Graphics used to draw circles
         HomographyMatrix Transformation_matrix;                     // Calculated matrix for perspective transformation
-        bool Calibrated_perspective = false;                        // Flag to indicate if perspective already is calibrated
-        bool Calibrated_laser = false;                              // Flag to indicate if laser already is calibrated
-        bool Marking_spot = false;                                  // Flag to indicate if program currently is in laser marking mode (selecting spot for calibrating laser)
-        bool Mouse_down = false;                                    // Flag to indicate if mouse button is down, used for laser marking mode
         Rectangle Spot;                                             // Selected laserspot
         Hsv Color_spot;                                             // Average color of selected spot
 
@@ -59,11 +61,10 @@ namespace Laserboard
             frm_filtered.Text = "Filtered";
             frm_filtered.Show();
             frm_laser.Text = "Laser";
-            //frm_laser.box_image.SizeMode = PictureBoxSizeMode.CenterImage;
             frm_laser.Show();
 
 
-            // Positions
+            // Align secondary windows side by side
             if (frm_webcam.Location.X + frm_webcam.Width + frm_transformed.Width < Screen.PrimaryScreen.Bounds.Width)
             {
                 frm_transformed.Location = new Point(frm_webcam.Location.X + frm_webcam.Width, frm_webcam.Location.Y);
@@ -91,9 +92,8 @@ namespace Laserboard
             }
             catch
             {
-                lbl_info.Text = "Webcam not found. Using testmode";
-                Calibrated_perspective = true;
-                Application.Idle += new EventHandler(Testmode);
+                // Webcam not found, display an error message
+                lbl_Cam_not_found.Show();
             }
         }
 
@@ -128,8 +128,11 @@ namespace Laserboard
 
             // Clear box_final
             box_final.BackColor = Color.Black;
-            box_final.SizeMode = PictureBoxSizeMode.StretchImage;
             box_final.Image = null;
+            Drawings.Clear(box_final.BackColor);
+
+            // Set size mode back to image stretch
+            box_final.SizeMode = PictureBoxSizeMode.StretchImage;
 
             return true; // Successful
         }
@@ -199,9 +202,7 @@ namespace Laserboard
             if (!Marking_spot) return; // Not in marking mode
             if (!Mouse_down) return;
 
-            // Clear
-            // Drawings.Clear(box_final.BackColor);
-            //box_final.Image = Image_transformed.ToBitmap();
+            // Display transformed image, so the user can select a spot for calibrating the laser
             Drawings.DrawImage(Image_transformed.Resize(box_final.Width, box_final.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC).ToBitmap(), 0, 0);
 
             // Set size with current position
@@ -239,43 +240,6 @@ namespace Laserboard
             btn_calibrate_laser.Enabled = true;
             btn_recalibrate_perspective.Enabled = true;
             Calibrated_laser = true;
-        }
-
-        private void Testmode(object sender, EventArgs e)
-        {
-            if (Marking_spot) return; // In marking mode
-
-            if (!File.Exists(FILE_TEST))
-            {
-                lbl_info.Text = "Webcam and test file not found.";
-                return;
-            }
-
-            frm_webcam.box_image.BackColor = Color.Gray;
-
-            // Load test image
-            Image_transformed = new Image<Bgr, Byte>(FILE_TEST);
-
-            // Clear box_final
-            box_final.Image = null;
-            box_final.BackColor = Color.Black;
-
-            btn_calibrate_laser.Enabled = true;
-
-            if (Calibrated_laser)
-            {
-                Filter();
-                Draw(Find_point());
-            }
-
-            // Display images
-            if (Image_webcam != null) frm_webcam.box_image.Image = Image_webcam.ToBitmap();
-            if (Image_transformed != null) frm_transformed.box_image.Image = Image_transformed.ToBitmap();
-            if (Image_filtered != null) frm_filtered.box_image.Image = Image_filtered.ToBitmap();
-            if (Image_laser != null) frm_laser.box_image.Image = Image_laser.ToBitmap();
-
-            // Simulate 30Fps
-            System.Threading.Thread.Sleep(33);
         }
 
         private void Show_cam(object sender, EventArgs e)
@@ -348,8 +312,8 @@ namespace Laserboard
                 circle_y = circles[0].Center.Y - circles[0].Radius;
                 diameter = 2 * circles[0].Radius;
 
-                //try // SubRect may be outside of image
-                //{
+                /// try // SubRect may be outside of image
+                /// {
                     // Get subpicture with laser
                     Image_laser = Image_transformed.GetSubRect(new Rectangle((int)circle_x - 10, (int)circle_y - 10, (int)diameter + 20, (int)diameter + 20));
                     // Draw rectangle
@@ -359,8 +323,8 @@ namespace Laserboard
                     Image_laser.DrawPolyline(new Point[] { new Point((int)diameter + 10, 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Right
                     // Stretch image 10 times because it's not possible to set interpolation method for picturebox
                     Image_laser = Image_laser.Resize(10, Emgu.CV.CvEnum.INTER.CV_INTER_AREA);
-                //}
-                //catch { }
+                /// }
+                /// catch { }
 
                 // Return circle as Rectangle
                 return new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter);
