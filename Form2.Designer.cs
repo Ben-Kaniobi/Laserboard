@@ -28,23 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.box_image = new System.Windows.Forms.PictureBox();
+            this.box_Image = new System.Windows.Forms.PictureBox();
             this.sfd_screenshot = new System.Windows.Forms.SaveFileDialog();
-            ((System.ComponentModel.ISupportInitialize)(this.box_image)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.box_Image)).BeginInit();
             this.SuspendLayout();
             // 
-            // box_image
+            // box_Image
             // 
-            this.box_image.BackColor = System.Drawing.Color.Black;
-            this.box_image.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.box_image.Location = new System.Drawing.Point(0, 0);
-            this.box_image.Name = "box_image";
-            this.box_image.Size = new System.Drawing.Size(284, 262);
-            this.box_image.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.box_image.TabIndex = 1;
-            this.box_image.TabStop = false;
-            this.box_image.Click += new System.EventHandler(this.box_image_Click);
-            this.box_image.MouseEnter += new System.EventHandler(this.box_image_MouseEnter);
+            this.box_Image.BackColor = System.Drawing.Color.Black;
+            this.box_Image.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.box_Image.Location = new System.Drawing.Point(0, 0);
+            this.box_Image.Name = "box_Image";
+            this.box_Image.Size = new System.Drawing.Size(284, 262);
+            this.box_Image.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.box_Image.TabIndex = 1;
+            this.box_Image.TabStop = false;
+            this.box_Image.Click += new System.EventHandler(this.box_image_Click);
+            this.box_Image.MouseEnter += new System.EventHandler(this.box_image_MouseEnter);
             // 
             // sfd_screenshot
             // 
@@ -59,19 +59,19 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
-            this.Controls.Add(this.box_image);
+            this.Controls.Add(this.box_Image);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "Form2";
             this.ShowInTaskbar = false;
             this.Text = "Form2";
-            ((System.ComponentModel.ISupportInitialize)(this.box_image)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.box_Image)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        public System.Windows.Forms.PictureBox box_image;
+        public System.Windows.Forms.PictureBox box_Image;
         private System.Windows.Forms.SaveFileDialog sfd_screenshot;
 
     }

@@ -14,7 +14,7 @@ namespace Laserboard
         private void box_image_MouseEnter(object sender, EventArgs e)
         {
             //Handle cursor
-            if (box_image.Image != null)
+            if (box_Image.Image != null)
             {
                 Cursor = Cursors.Hand;
             }
@@ -26,7 +26,7 @@ namespace Laserboard
 
         private void box_image_Click(object sender, EventArgs e)
         {
-            if (box_image.Image != null)
+            if (box_Image.Image != null)
             {
                 sfd_screenshot.FileName = "Screenshot_" + Text;
                 sfd_screenshot.ShowDialog();
@@ -36,7 +36,7 @@ namespace Laserboard
         private void sfd_Screenshot_FileOk(object sender, CancelEventArgs e)
         {
             //Safe file
-            box_image.Image.Save(sfd_screenshot.FileName);
+            box_Image.Image.Save(sfd_screenshot.FileName);
         }
     }
 }
