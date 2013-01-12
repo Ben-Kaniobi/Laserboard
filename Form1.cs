@@ -37,15 +37,17 @@ namespace Laserboard
 
         // Variables
         Capture Webcam;                                             // Webcam
-        Image<Gray, Byte> Image_chessboard;                         // Image with chessboard
+        Image<Gray, Byte> Image_chessboard;                         // Image with chessboard for calibration
         Image<Bgr, Byte> Image_webcam;                              // Image with current webcam frame
         Image<Bgr, Byte> Image_transformed;                         // Image with current webcam frame, transformed
         Image<Gray, Byte> Image_filtered;                           // Image with current webcam frame, transformed and filtered
         Image<Bgr, Byte> Image_laser;                               // Image with current laser spot
-        Graphics Drawings;                                          // Graphics used to draw circles
         HomographyMatrix Transformation_matrix;                     // Calculated matrix for perspective transformation
         Rectangle Spot;                                             // Selected laserspot
         Hsv Color_spot;                                             // Average color of selected spot
+        Graphics Drawings;                                          // Graphics used to draw circles
+        Point Point_old;                                            // Points used to draw sublines
+        Pen Pen_laser = new Pen(Color.DarkBlue, 3);                 // Pen that draws the lines
 
         public Form1()
         {
@@ -225,6 +227,7 @@ namespace Laserboard
             Spot.Y = (int)(factor_y * Spot.Y);
             Spot.Width = (int)(factor_x * Spot.Width);
             Spot.Height = (int)(factor_y * Spot.Height);
+            if (Spot.Width * Spot.Height <= 0) return; // Return if spot had no area
 
             // Get average color (HSV) of the spot
             Color_spot = Image_transformed.GetSubRect(Norm_rectangle(Spot)).Convert<Hsv, Byte>().GetAverage();
@@ -285,15 +288,16 @@ namespace Laserboard
             // Blur image and find colors between thresholds
             Image_filtered = Image_transformed.Convert<Hsv, Byte>().SmoothBlur(20, 20).InRange(threshold_lower, threshold_higher);
 
-            // Reduce size of the spot
-            Image_filtered = Image_filtered.Erode(4);
+            // Increase size of the spot and remove possible hole where color was too bright
+            Image_filtered = Image_filtered.Dilate(5);
         }
 
         private Rectangle Find_point()
         {
-            float circle_x;
-            float circle_y;
-            float diameter;
+            int circle_x;
+            int circle_y;
+            int diameter;
+            Rectangle rect;
 
             // Find Circles
             CircleF[] circles = Image_filtered.HoughCircles(
@@ -308,26 +312,35 @@ namespace Laserboard
             if (circles.Length > 0)
             {
                 // Calculate coordinates and diameter of first circle
-                circle_x = circles[0].Center.X - circles[0].Radius;
-                circle_y = circles[0].Center.Y - circles[0].Radius;
-                diameter = 2 * circles[0].Radius;
+                circle_x = (int)circles[0].Center.X - (int)circles[0].Radius;
+                circle_y = (int)circles[0].Center.Y - (int)circles[0].Radius;
+                diameter = 2 * (int)circles[0].Radius;
 
-                /// try // SubRect may be outside of image
-                /// {
-                    // Get subpicture with laser
-                    Image_laser = Image_transformed.GetSubRect(new Rectangle((int)circle_x - 10, (int)circle_y - 10, (int)diameter + 20, (int)diameter + 20));
-                    // Draw rectangle
-                    Image_laser.DrawPolyline(new Point[] { new Point(10, 10), new Point((int)diameter + 10, 10) }, true, new Bgr(Color.Blue), 1); // Top
-                    Image_laser.DrawPolyline(new Point[] { new Point(10, 10), new Point(10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Left
-                    Image_laser.DrawPolyline(new Point[] { new Point(10, (int)diameter + 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Bottom
-                    Image_laser.DrawPolyline(new Point[] { new Point((int)diameter + 10, 10), new Point((int)diameter + 10, (int)diameter + 10) }, true, new Bgr(Color.Blue), 1); // Right
-                    // Stretch image 10 times because it's not possible to set interpolation method for picturebox
-                    Image_laser = Image_laser.Resize(10, Emgu.CV.CvEnum.INTER.CV_INTER_AREA);
-                /// }
-                /// catch { }
+                // Create a rectangle that is 10 bigger on each side
+                rect = new Rectangle(circle_x - 10, circle_y - 10, diameter + 20, diameter + 20);
+
+                // Make sure the whole rectangle is inside the image
+                if (rect.X + rect.Width > Image_transformed.Width) rect.Width = Image_transformed.Width - rect.X; // Width max. to right image border
+                if (rect.Y + rect.Height > Image_transformed.Height) rect.Height = Image_transformed.Height - rect.Y; // Height max. to bottom image bordor
+                if (rect.X < 0)
+                {
+                    rect.Width += rect.X; // Reduce width by the same amount that X is too small
+                    rect.X = 0;
+                }
+                if (rect.Y < 0)
+                {
+                    rect.Height += rect.Y; // Reduce height by the same amount that Y is too small
+                    rect.Y = 0;
+                }
+
+                // Get subpicture with laser
+                Image_laser = Image_transformed.GetSubRect(rect);
+
+                // Stretch image 10 times because it's not possible to set interpolation method for picturebox
+                Image_laser = Image_laser.Resize(10, Emgu.CV.CvEnum.INTER.CV_INTER_AREA); // Stretch with interpolation mode area, so pixels are visible
 
                 // Return circle as Rectangle
-                return new Rectangle((int)circle_x, (int)circle_y, (int)diameter, (int)diameter);
+                return new Rectangle(circle_x, circle_y, diameter, diameter);
             }
             // No circle
             return new Rectangle(-1, -1, -1, -1);
@@ -335,41 +348,35 @@ namespace Laserboard
 
         private void Draw(Rectangle circle)
         {
-            // Clear image
-            Drawings.Clear(box_final.BackColor);
-
-            if (circle.X == -1 || circle.Y == -1 || circle.Width == -1 || circle.Height == -1) return; // No circle
-
-            Pen pen_circle = new Pen(Color.DarkBlue, 3);
+            if (circle.X == -1 || circle.Y == -1 || circle.Width == -1 || circle.Height == -1) // No circle
+            {
+                // Reset point and return
+                Point_old = new Point(-1, -1);
+                return;
+            }
 
             // Get scale factors
-            float circle_x = circle.X;
-            float circle_y = circle.Y;
             float factor_x = (float)box_final.Width / Image_filtered.Width;
             float factor_y = (float)box_final.Height / Image_filtered.Height;
 
-            // Convert coordinates for picturebox box_final
-            circle_x *= factor_x;
-            circle_y *= factor_y;
+            // Create a point adjusted for the picturebox size
+            Point circle_point = new Point((int)(circle.X * factor_x), (int)(circle.Y * factor_y));
 
-            lbl_info.Text = circle_x.ToString() + " " + circle_y.ToString();
+            ////Drawings.DrawEllipse(pen_circle, circle_x, circle_y, circle.Width + pen_circle.Width, circle.Height + pen_circle.Width);
 
-            Drawings.DrawEllipse(pen_circle, circle_x, circle_y, circle.Width + pen_circle.Width, circle.Height + pen_circle.Width);
-
-            /*Mark multiple circles
-            // int circle_number = 0;
-            // lbl_info.Text = "";
-            // foreach (CircleF circle in circles)
+            if (Point_old.X == -1 || Point_old.Y == -1)
             {
-                if (circle_number >= 3)
-                {
-                    lbl_info.Text += " +";
-                    return;
-                }
-                circle_number++;
-                lbl_info.Text += "(" + circle.Center.X + "; " + circle.Center.Y + ")  ";
-                Grafik.DrawEllipse(circlepen, circle.Center.X - circle.Radius, circle.Center.Y - circle.Radius, circle.Radius * 2, circle.Radius * 2);
-            }*/
+                // Fist point
+                Point_old = circle_point;
+            }
+            else
+            {
+                // Draw line from last point to current point
+                Drawings.DrawLine(Pen_laser, Point_old, circle_point);
+
+                // Save current point
+                Point_old = circle_point;
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
