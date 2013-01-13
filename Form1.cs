@@ -29,6 +29,7 @@ namespace Laserboard
         const int OFFSET_CHESSBOARD = 7;                            // Width of black frame around chessboard
         const string FILE_TEST = @"..\..\files\Screenshot.png";     // Testfile when no webcam was found
         const string STRING_NO_WEBCAM = "Webcam not found";         // String which is displayed if no webcam was found
+        const string STRING_PAUSE_MODE = "[Paused]";                // String which is displayed while in pause mode
         const string STRING_CALIBRATION_INFO = "[L] Laser calibration    [P] Perspective recalibration    [F] Fullscreen toggle    [I] Info toggle";
 
         // Flags
@@ -36,6 +37,7 @@ namespace Laserboard
         bool Perspective_calibrated = false;                        // Indicates if perspective already is calibrated
         bool Laser_calibrated = false;                              // Indicates if laser already is calibrated
         bool Calibrating_laser = false;                             // Indicates if program currently is in laser calibration mode
+        bool Pause_mode = false;                                    // Doesn't analyse the image if pause mode is active
         bool Mouse_down = false;                                    // Indicates if mouse button is down, used for laser calibration mode
 
         // Variables
@@ -60,13 +62,14 @@ namespace Laserboard
             // Change parent of the label, needed for correct transparency
             lbl_Info.Parent = box_Final;
             lbl_Info.BackColor = Color.Transparent;
+
+            // Add some eventhandlers
+            GotFocus += new EventHandler(Form1_GotFocus);
+            LostFocus += new EventHandler(Form1_LostFocus);
         }
         
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Add event
-            LostFocus += new EventHandler(Form1_LostFocus);
-
             frm_webcam.Text = "Webcam";
             frm_webcam.Show();
             frm_transformed.Text = "Transformed";
@@ -343,8 +346,11 @@ namespace Laserboard
 
                 if (Laser_calibrated)
                 {
+                    // Create binary image
                     Filter();
-                    Draw(Find_point());
+
+                    // Find point and draw, if analysing is't paused
+                    if(!Pause_mode) Draw(Find_point());
                 }
             }
             else
@@ -472,8 +478,19 @@ namespace Laserboard
             }
         }
 
+        private void Form1_GotFocus(object sender, EventArgs e)
+        {
+            // Resume image analysing
+            Pause_mode = false;
+            lbl_Info.Text = "";
+        }
+
         private void Form1_LostFocus(object sender, EventArgs e)
         {
+            // Pause image analysing
+            Pause_mode = true;
+            lbl_Info.Text = STRING_PAUSE_MODE;
+
             // If in fullscreen mode, turn it off
             if (FormBorderStyle == FormBorderStyle.None)
             {
@@ -486,6 +503,8 @@ namespace Laserboard
 
         private void box_Final_SizeChanged(object sender, EventArgs e)
         {
+            if (box_Final.Width * box_Final.Height <= 0) return; // Window minimised
+
             // Reset flag to start a new calibration
             Perspective_calibrated = false;
         }
