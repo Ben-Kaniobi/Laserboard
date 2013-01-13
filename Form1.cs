@@ -62,10 +62,6 @@ namespace Laserboard
             // Change parent of the label, needed for correct transparency
             lbl_Info.Parent = box_Final;
             lbl_Info.BackColor = Color.Transparent;
-
-            // Add some eventhandlers
-            GotFocus += new EventHandler(Form1_GotFocus);
-            LostFocus += new EventHandler(Form1_LostFocus);
         }
         
         private void Form1_Load(object sender, EventArgs e)
@@ -105,7 +101,12 @@ namespace Laserboard
             {
                 // Capture Webcam
                 Webcam = new Capture();
+                // Use idle event to display camera image
                 Application.Idle += new EventHandler(Show_cam);
+
+                // Add event handlers to detect when window is in background
+                GotFocus += new EventHandler(Form1_GotFocus);
+                LostFocus += new EventHandler(Form1_LostFocus);
             }
             catch
             {
