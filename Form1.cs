@@ -399,9 +399,19 @@ namespace Laserboard
             return new Rectangle(-1, -1, -1, -1);
         }
 
+        private float Distance(Point pt1, Point pt2)
+        {
+            // Calculate legs of right triangle
+            int a = pt2.X - pt1.X;
+            int b = pt2.Y - pt1.Y;
+
+            // Return hypotenuse calculated with pythagoras
+            return (float)Math.Sqrt(a * a + b * b);
+        }
+
         private void Draw(Rectangle circle)
         {
-            if (circle.X == -1 || circle.Y == -1 || circle.Width == -1 || circle.Height == -1) // No circle
+            if (circle.Width >= 50 || circle.Height >= 50 || circle.X == -1 || circle.Y == -1 || circle.Width == -1 || circle.Height == -1) // Circle too big or no circle
             {
                 // Reset point and return
                 Point_old = new Point(-1, -1);
@@ -415,11 +425,11 @@ namespace Laserboard
             // Create a point adjusted for the picturebox size
             Point circle_point = new Point((int)(circle.X * factor_x), (int)(circle.Y * factor_y));
 
-            ////Drawings.DrawEllipse(pen_circle, circle_x, circle_y, circle.Width + pen_circle.Width, circle.Height + pen_circle.Width);
-
-            if (Point_old.X == -1 || Point_old.Y == -1)
+            if (Point_old.X == -1 || Point_old.Y == -1 || Distance(Point_old, circle_point) > box_Final.Width / 4)
             {
-                // Fist point
+                // Point_old not yet set, ordistance between the two points is grater than a quarter of the image width
+
+                // Save First point
                 Point_old = circle_point;
             }
             else
