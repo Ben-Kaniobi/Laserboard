@@ -25,5 +25,5 @@ Requirements
 Download
 --------
 * Project ([zip](/CaptainBlagbird/Laserboard/zipball/master)) ([tar.gz](/CaptainBlagbird/Laserboard/tarball/master))
-* Executable v.1.0 Beta ([zip](/CaptainBlagbird/Laserboard_executable/zipball/master))
+* Executable v1.0 Beta ([zip](/CaptainBlagbird/Laserboard_executable/zipball/master))
 ([tar.gz](/CaptainBlagbird/Laserboard_executable/tarball/master))
