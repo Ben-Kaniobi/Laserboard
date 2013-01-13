@@ -29,7 +29,7 @@ namespace Laserboard
         const int OFFSET_CHESSBOARD = 7;                            // Width of black frame around chessboard
         const string FILE_TEST = @"..\..\files\Screenshot.png";     // Testfile when no webcam was found
         const string STRING_NO_WEBCAM = "Webcam not found";         // String which is displayed if no webcam was found
-        const string STRING_CALIBRATION_INFO = "[I] Toggle keys info    [L] laser calibration    [P] perspective recalibration";
+        const string STRING_CALIBRATION_INFO = "[L] Laser calibration    [P] Perspective recalibration    [F] Fullscreen toggle    [I] Info toggle";
 
         // Flags
         bool Ready_for_calibration_l;                               // Is set as soon as the transformed image is ready for the laser calibration (is never reset)
@@ -51,6 +51,7 @@ namespace Laserboard
         Graphics Drawings;                                          // Graphics used to draw circles
         Point Point_old;                                            // Points used to draw sublines
         Pen Pen_laser = new Pen(Color.DarkBlue, 3);                 // Pen that draws the lines
+        FormWindowState Last_window_state = FormWindowState.Normal; // Used to return from fullscreen to same window state as before entering fullscreen
 
         public Form1()
         {
@@ -63,6 +64,9 @@ namespace Laserboard
         
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Add event
+            LostFocus += new EventHandler(Form1_LostFocus);
+
             frm_webcam.Text = "Webcam";
             frm_webcam.Show();
             frm_transformed.Text = "Transformed";
@@ -123,7 +127,7 @@ namespace Laserboard
             lbl_Info.Text = "";
 
             // Display chessboard
-            box_Final.BackColor = Color.Black;
+            box_Final.BackColor = Color.White;
             box_Final.SizeMode = PictureBoxSizeMode.CenterImage;
             box_Final.Image = Image_chessboard.Resize(box_Final.Width - 2 * OFFSET_CHESSBOARD, box_Final.Height - 2 * OFFSET_CHESSBOARD, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC).ToBitmap();
             
@@ -169,6 +173,7 @@ namespace Laserboard
 
                     // Don't continue if laser calibration mode is active
                     if (Calibrating_laser) break;
+
                     // Reset calibration flag
                     Perspective_calibrated = false;
                     break;
@@ -179,13 +184,37 @@ namespace Laserboard
                     if (!Ready_for_calibration_l) break;
                     // Don't continue if laser calibration mode already is active
                     if(Calibrating_laser) break;
+
                     // Reset flag
                     Laser_calibrated = false;
+
                     // Start calibration mode
                     box_Final.Image = Image_transformed.ToBitmap();
-                    box_Final.Cursor = Cursors.Cross;
+                    Cursor.Show();
                     Calibrating_laser = true;
                     // -> Rest is done in box_final_MouseDown(), box_final_MouseMove() and box_final_MouseUp()
+                    break;
+
+                case Keys.F: // Toggle fullscreen
+
+                    if (FormBorderStyle == FormBorderStyle.None)
+                    {
+                        // Switch fullscreen mode off
+                        FormBorderStyle = FormBorderStyle.Sizable;
+                        WindowState = Last_window_state;
+                        TopMost = false;
+                    }
+                    else
+                    {
+                        // Remember window state and set to normal to avoid problems
+                        Last_window_state = WindowState;
+                        WindowState = FormWindowState.Normal;
+
+                        // Switch fullscreen mode on
+                        FormBorderStyle = FormBorderStyle.None;
+                        WindowState = FormWindowState.Maximized;
+                        TopMost = true;
+                    }
                     break;
 
                 case Keys.Escape:
@@ -193,7 +222,7 @@ namespace Laserboard
                     // Stop calibration mode
                     box_Final.Image = null;
                     Drawings.Clear(box_Final.BackColor);
-                    box_Final.Cursor = Cursors.Default;
+                    Cursor.Hide();
                     Calibrating_laser = false;
                     break;
             }
@@ -284,7 +313,7 @@ namespace Laserboard
             // Stop calibration mode
             box_Final.Image = null;
             Drawings.Clear(box_Final.BackColor);
-            box_Final.Cursor = Cursors.Default;
+            Cursor.Hide();
             Calibrating_laser = false;
 
             // Set calibration successfully completed flag
@@ -300,8 +329,9 @@ namespace Laserboard
 
             if (Perspective_calibrated)
             {
-                //// Set the color for areas that are out of camera view red for later detection (to do / enhancement)
-                Bgr color_outside = new Bgr(Color.Red);
+                // Set color of areas that are out of camera view to black.
+                //// To do / enhancement: Set the color to a specified color to detect and avoid out of view perspectives
+                Bgr color_outside = new Bgr(Color.Black);
 
                 // Transform image
                 Image_transformed = Image_webcam.WarpPerspective(Transformation_matrix, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC, Emgu.CV.CvEnum.WARP.CV_WARP_FILL_OUTLIERS, color_outside);
@@ -442,9 +472,40 @@ namespace Laserboard
             }
         }
 
+        private void Form1_LostFocus(object sender, EventArgs e)
+        {
+            // If in fullscreen mode, turn it off
+            if (FormBorderStyle == FormBorderStyle.None)
+            {
+                // Switch fullscreen mode off
+                FormBorderStyle = FormBorderStyle.Sizable;
+                WindowState = Last_window_state;
+                TopMost = false;
+            }
+        }
+
+        private void box_Final_SizeChanged(object sender, EventArgs e)
+        {
+            // Reset flag to start a new calibration
+            Perspective_calibrated = false;
+        }
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Dispose();
+        }
+
+        private void box_Final_MouseEnter(object sender, EventArgs e)
+        {
+            // Hide cursor on entering box_final, but not if in laser calibration mode
+            if (Calibrating_laser) return;
+            Cursor.Hide();
+        }
+
+        private void box_Final_MouseLeave(object sender, EventArgs e)
+        {
+            // Show cursor again on leaving box_final
+            Cursor.Show();
         }
     }
 }

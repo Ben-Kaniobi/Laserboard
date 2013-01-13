@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
             this.box_Image = new System.Windows.Forms.PictureBox();
             this.sfd_screenshot = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.box_Image)).BeginInit();
@@ -61,6 +62,7 @@
             this.ClientSize = new System.Drawing.Size(284, 262);
             this.Controls.Add(this.box_Image);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form2";
             this.ShowInTaskbar = false;
             this.Text = "Form2";

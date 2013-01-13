@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV, Version=2.4.2.1777, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -101,7 +104,8 @@
     <Content Include="Emgu.CV.dll" />
     <Content Include="Emgu.CV.UI.dll" />
     <Content Include="Emgu.Util.dll" />
-    <None Include="ressources\Chessboard.png" />
+    <None Include="resources\Chessboard.png" />
+    <Content Include="icon.ico" />
     <Content Include="x86\cublas32_42_9.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

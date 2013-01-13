@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.box_Final = new System.Windows.Forms.PictureBox();
             this.lbl_Info = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.box_Final)).BeginInit();
@@ -36,7 +37,7 @@
             // box_Final
             // 
             this.box_Final.BackColor = System.Drawing.Color.Black;
-            this.box_Final.Cursor = System.Windows.Forms.Cursors.Default;
+            this.box_Final.Cursor = System.Windows.Forms.Cursors.Cross;
             this.box_Final.Dock = System.Windows.Forms.DockStyle.Fill;
             this.box_Final.Location = new System.Drawing.Point(0, 0);
             this.box_Final.Name = "box_Final";
@@ -44,7 +45,10 @@
             this.box_Final.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.box_Final.TabIndex = 10;
             this.box_Final.TabStop = false;
+            this.box_Final.SizeChanged += new System.EventHandler(this.box_Final_SizeChanged);
             this.box_Final.MouseDown += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseDown);
+            this.box_Final.MouseEnter += new System.EventHandler(this.box_Final_MouseEnter);
+            this.box_Final.MouseLeave += new System.EventHandler(this.box_Final_MouseLeave);
             this.box_Final.MouseMove += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseMove);
             this.box_Final.MouseUp += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseUp);
             // 
@@ -67,7 +71,7 @@
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.lbl_Info);
             this.Controls.Add(this.box_Final);
-            this.MaximizeBox = false;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(400, 300);
             this.Name = "Form1";
             this.Text = "Laserboard";
