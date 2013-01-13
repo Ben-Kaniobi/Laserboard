@@ -45,7 +45,7 @@
             this.box_Final.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.box_Final.TabIndex = 10;
             this.box_Final.TabStop = false;
-            this.box_Final.SizeChanged += new System.EventHandler(this.box_Final_SizeChanged);
+            this.box_Final.SizeChanged += new System.EventHandler(this.box_Size_or_position_changed);
             this.box_Final.MouseDown += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseDown);
             this.box_Final.MouseEnter += new System.EventHandler(this.box_Final_MouseEnter);
             this.box_Final.MouseLeave += new System.EventHandler(this.box_Final_MouseLeave);
@@ -77,6 +77,7 @@
             this.Text = "Laserboard";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.LocationChanged += new System.EventHandler(this.box_Size_or_position_changed);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.box_Final)).EndInit();
             this.ResumeLayout(false);

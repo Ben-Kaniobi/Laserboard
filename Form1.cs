@@ -284,6 +284,9 @@ namespace Laserboard
             if (!Calibrating_laser) return; // Not in calibration mode
             if (!Mouse_down) return;
 
+            // Make sure cursor is shown
+            Cursor.Show();
+
             // Display transformed image, so the user can select a spot for calibrating the laser
             Drawings.DrawImage(Image_transformed.Resize(box_Final.Width, box_Final.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC).ToBitmap(), 0, 0);
 
@@ -502,7 +505,7 @@ namespace Laserboard
             }
         }
 
-        private void box_Final_SizeChanged(object sender, EventArgs e)
+        private void box_Size_or_position_changed(object sender, EventArgs e)
         {
             if (box_Final.Width * box_Final.Height <= 0) return; // Window minimised
 
