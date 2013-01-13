@@ -3,7 +3,7 @@ Laserboard
 Smartboard simulation to use a laser pointer as marker/pen. No additional hardware is required, as it works with an ordinary webcam.
 EmguCV project written in C# and developped with Microsoft Visual Studio Express.
 
-![Title](/CaptainBlagbird/Laserboard/master/files/Documentation/Images/Title.png)
+![Title art](/CaptainBlagbird/Laserboard/raw/master/files/Documentation/Images/Title.PNG)
 
 Requirements
 ------------
@@ -25,4 +25,4 @@ Requirements
 Download
 --------
 * Project ([zip](/CaptainBlagbird/Laserboard/zipball/master)) ([tar.gz](/CaptainBlagbird/Laserboard/tarball/master))
-* Executable v.1.0 Beta ([zip](/CaptainBlagbird/Laserboard/master/files/Executable/Laserboard_v1.0.zip))
+* Executable v.1.0 Beta ([zip](/CaptainBlagbird/Laserboard/raw/master/files/Executable/Laserboard_v1.0.zip))
