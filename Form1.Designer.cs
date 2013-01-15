@@ -37,7 +37,6 @@
             // box_Final
             // 
             this.box_Final.BackColor = System.Drawing.Color.Black;
-            this.box_Final.Cursor = System.Windows.Forms.Cursors.Cross;
             this.box_Final.Dock = System.Windows.Forms.DockStyle.Fill;
             this.box_Final.Location = new System.Drawing.Point(0, 0);
             this.box_Final.Name = "box_Final";
@@ -47,8 +46,6 @@
             this.box_Final.TabStop = false;
             this.box_Final.SizeChanged += new System.EventHandler(this.box_Size_or_position_changed);
             this.box_Final.MouseDown += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseDown);
-            this.box_Final.MouseEnter += new System.EventHandler(this.box_Final_MouseEnter);
-            this.box_Final.MouseLeave += new System.EventHandler(this.box_Final_MouseLeave);
             this.box_Final.MouseMove += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseMove);
             this.box_Final.MouseUp += new System.Windows.Forms.MouseEventHandler(this.box_final_MouseUp);
             // 
@@ -75,7 +72,6 @@
             this.MinimumSize = new System.Drawing.Size(400, 300);
             this.Name = "Form1";
             this.Text = "Laserboard";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.LocationChanged += new System.EventHandler(this.box_Size_or_position_changed);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);

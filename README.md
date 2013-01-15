@@ -18,9 +18,11 @@ Requirements
 * Microsoft Visual C# Express
 * [EmguCV](http://sourceforge.net/projects/emgucv/)
 
-### On "nvcuda.dll could not be found" error
-* If you don't have an nVidia graphics card you might get an error "nvcuda.dll could not be found".
-  I downloaded it from [dll-files.com](http://www.dll-files.com/dllindex/dll-files.shtml?nvcuda) which worked for me.
+"nvcuda.dll could not be found" error
+-------------------------------------
+You may get this error if you don't have an nVidia graphics card.
+* Download nvcuda.zip from http://www.dll-files.com/dllindex/dll-files.shtml?nvcuda
+* Copy nvcuda.dll from the archive to the same path where Laserboard.exe is or to %WINDIR%/System32/
 
 Download
 --------

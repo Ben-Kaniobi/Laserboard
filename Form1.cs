@@ -63,9 +63,10 @@ namespace Laserboard
             lbl_Info.Parent = box_Final;
             lbl_Info.BackColor = Color.Transparent;
         }
-        
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Show debug windows
             frm_webcam.Text = "Webcam";
             frm_webcam.Show();
             frm_transformed.Text = "Transformed";
@@ -194,7 +195,7 @@ namespace Laserboard
 
                     // Start calibration mode
                     box_Final.Image = Image_transformed.ToBitmap();
-                    Cursor.Show();
+                    box_Final.Cursor = Cursors.Cross;
                     Calibrating_laser = true;
                     // -> Rest is done in box_final_MouseDown(), box_final_MouseMove() and box_final_MouseUp()
                     break;
@@ -225,8 +226,8 @@ namespace Laserboard
 
                     // Stop calibration mode
                     box_Final.Image = null;
+                    box_Final.Cursor = Cursors.Default;
                     Drawings.Clear(box_Final.BackColor);
-                    Cursor.Hide();
                     Calibrating_laser = false;
                     break;
             }
@@ -284,9 +285,6 @@ namespace Laserboard
             if (!Calibrating_laser) return; // Not in calibration mode
             if (!Mouse_down) return;
 
-            // Make sure cursor is shown
-            Cursor.Show();
-
             // Display transformed image, so the user can select a spot for calibrating the laser
             Drawings.DrawImage(Image_transformed.Resize(box_Final.Width, box_Final.Height, Emgu.CV.CvEnum.INTER.CV_INTER_CUBIC).ToBitmap(), 0, 0);
 
@@ -319,8 +317,8 @@ namespace Laserboard
 
             // Stop calibration mode
             box_Final.Image = null;
+            box_Final.Cursor = Cursors.Default;
             Drawings.Clear(box_Final.BackColor);
-            Cursor.Hide();
             Calibrating_laser = false;
 
             // Set calibration successfully completed flag
@@ -511,24 +509,6 @@ namespace Laserboard
 
             // Reset flag to start a new calibration
             Perspective_calibrated = false;
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            Dispose();
-        }
-
-        private void box_Final_MouseEnter(object sender, EventArgs e)
-        {
-            // Hide cursor on entering box_final, but not if in laser calibration mode
-            if (Calibrating_laser) return;
-            Cursor.Hide();
-        }
-
-        private void box_Final_MouseLeave(object sender, EventArgs e)
-        {
-            // Show cursor again on leaving box_final
-            Cursor.Show();
         }
     }
 }
