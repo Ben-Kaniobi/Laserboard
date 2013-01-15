@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-
 using System.IO;
 using System.Drawing.Drawing2D;
 using Emgu.CV;
-using Emgu.Util;
 using Emgu.CV.Structure;
 
 namespace Laserboard
@@ -86,7 +79,6 @@ namespace Laserboard
             frm_filtered.Show();
             frm_laser.Text = "Laser";
             frm_laser.Show();
-
 
             // Align secondary windows side by side
             if (frm_webcam.Location.X + frm_webcam.Width + frm_transformed.Width < Screen.PrimaryScreen.Bounds.Width)
@@ -366,8 +358,9 @@ namespace Laserboard
                     if(!Pause_mode) Draw(Find_point());
                 }
             }
-            else
+            else if (!Pause_mode)
             {
+                // Calibrate perspective if not in pause mode
                 Perspective_calibrated = Calibrate_perspective();
             }
 
