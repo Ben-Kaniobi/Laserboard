@@ -66,6 +66,17 @@ namespace Laserboard
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Check if nvcuda.dll is missing
+            if (!(File.Exists("nvcuda.dll") || File.Exists(Environment.ExpandEnvironmentVariables(@"%WINDIR%\System32\nvcuda.dll"))))
+            {
+                // Display error message
+                MessageBox.Show("The program can't start because nvcuda.dll is missing from your computer.\n\nSee README.md for infos.", "nvcuda.dll not found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Close
+                Close();
+                return;
+            }
+
             // Show debug windows
             frm_webcam.Text = "Webcam";
             frm_webcam.Show();
