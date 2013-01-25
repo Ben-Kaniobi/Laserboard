@@ -80,6 +80,8 @@ namespace Laserboard
             frm_laser.Text = "Laser";
             frm_laser.Show();
 
+            frm_webcam.Location = new Point(10, 10);
+
             // Align secondary windows side by side
             if (frm_webcam.Location.X + frm_webcam.Width + frm_transformed.Width < Screen.PrimaryScreen.Bounds.Width)
             {

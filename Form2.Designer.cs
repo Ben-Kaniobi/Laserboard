@@ -40,7 +40,7 @@
             this.box_Image.Dock = System.Windows.Forms.DockStyle.Fill;
             this.box_Image.Location = new System.Drawing.Point(0, 0);
             this.box_Image.Name = "box_Image";
-            this.box_Image.Size = new System.Drawing.Size(284, 262);
+            this.box_Image.Size = new System.Drawing.Size(284, 212);
             this.box_Image.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.box_Image.TabIndex = 1;
             this.box_Image.TabStop = false;
@@ -59,13 +59,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
+            this.ClientSize = new System.Drawing.Size(284, 212);
             this.Controls.Add(this.box_Image);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form2";
             this.ShowInTaskbar = false;
             this.Text = "Form2";
+            this.ResizeBegin += new System.EventHandler(this.Form2_ResizeBegin);
+            this.ResizeEnd += new System.EventHandler(this.Form2_ResizeEnd);
             ((System.ComponentModel.ISupportInitialize)(this.box_Image)).EndInit();
             this.ResumeLayout(false);
 
