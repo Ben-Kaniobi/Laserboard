@@ -26,6 +26,6 @@ You may get this error if you don't have an nVidia graphics card.
 
 Download
 --------
-* Project ([zip](https://github.com/CaptainBlagbird/Laserboard/archive/master.zip)) ([tar.gz](https://github.com/CaptainBlagbird/Laserboard/archive/master.tar.gz))
-* Executable v1.1 ([zip](https://github.com/CaptainBlagbird/Laserboard_executable/archive/master.zip))
-([tar.gz](https://github.com/CaptainBlagbird/Laserboard_executable/archive/master.tar.gz))
+* Project ([zip](https://github.com/Ben-Kaniobi/Laserboard/archive/master.zip)) ([tar.gz](https://github.com/CaptainBlagbird/Laserboard/archive/master.tar.gz))
+* Executable v1.1 ([zip](https://github.com/Ben-Kaniobi/Laserboard_executable/archive/master.zip))
+([tar.gz](https://github.com/Ben-Kaniobi/Laserboard_executable/archive/master.tar.gz))
