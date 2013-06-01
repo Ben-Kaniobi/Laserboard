@@ -1,7 +1,7 @@
 Laserboard
 ==========
 Smartboard simulation to use a laser pointer as marker/pen. No additional hardware is required, as it works with an ordinary webcam.
-Emgu CV project written in C# and developped with Microsoft Visual Studio Express.
+Emgu CV project written in C# and developped with Microsoft Visual Studio 2010 Express.
 
 ![Title art](/files/Images/Title.PNG "Title art")
 
