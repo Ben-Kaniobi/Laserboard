@@ -26,5 +26,17 @@ You may get this error if you don't have an nVidia graphics card.
 
 Download
 --------
-* Project ([zip](https://github.com/Ben-Kaniobi/Laserboard/archive/master.zip))
-* Executable v1.1 ([zip](https://github.com/Ben-Kaniobi/Laserboard_executable/archive/master.zip))
+* Project ([zip](../../archive/master.zip))
+* Executable ([zip](../../releases))
+
+Usage
+-----
+1. Connect your webcam and point it to the screen
+2. Run *Laserboard.exe*
+3. Move/resize the main window (labeled "Laserboard") so that the webcam sees the whole window, the checkboard will dissapear once the window was found by the webcam/software  
+   *The prespective is now calibrated, you may press `P` or resize/move the window to redo this step*
+4. Point your laser at the screen and press `L`, the main windows will display a webcam screenshot
+5. User your mouse cursor to select the laser point, make sure to select as little of the black background as possible  
+   *The laser pointer is now calibrated, you may redo step 4-5 at any time after calibrating the perspective*
+6. Use the laser pointer to draw on the screen  
+   *You may press `I` to display the available keybindings*
